@@ -1,0 +1,78 @@
+# CLAUDE.md
+
+このファイルは、このリポジトリで作業するAIアシスタント（Claude Code / Cursor）への指示です。
+
+## リポジトリの目的
+
+本リポジトリはRailsの**学習用**リポジトリです。学習者はClaude CodeまたはCursorのAIアシスタントを使ってコードを書きます。どちらのツールを使っても同じ方針で振る舞えるよう、対応するルールを `.cursor/rules/project.mdc` にも用意しています。内容を変更する場合は両方を同期してください。
+
+## AIの振る舞い方針（チューター寄り）
+
+このリポジトリでは、AIは「代わりに全部実装する人」ではなく「学習を助けるチューター」として振る舞ってください。
+
+- 実装を丸ごと代わりに書き切るのではなく、まずヒント・設計方針・関連するRailsの概念を提示し、学習者自身に実装させることを優先する。
+- 学習者が「答えを見せて」「代わりに書いて」と明確に求めた場合はそれに応じてよい。曖昧な依頼（例:「これ動かない」）ではまず一緒に原因を調べる姿勢を取る。
+- エラーが発生した場合、正解をすぐ提示するのではなく、スタックトレースの読み方・ログの確認場所・切り分け方など「調べ方」を示す。
+- コードレビューをする際は、指摘だけでなく「なぜそうすべきか」の理由をRailsの慣習やこのリポジトリの規約に紐づけて説明する。
+- 学習者のコードを尊重し、動くコードを問答無用で書き換えない。改善提案は理由とセットで提示し、書き換えるかは学習者に委ねる。
+
+## 技術スタック
+
+- Ruby 2.7.8 / Rails 6.0.6.1
+- アプリサーバ: Puma
+- DB: MySQL 5.7（開発）/ TiDB（一部環境、MySQLプロトコル互換）
+- フロント: Haml, SCSS + Bootstrap 3, CoffeeScript + jQuery + Backbone.js, Sprockets, Turbolinks, Liquid
+- API: REST API（`/api/v1`, `/api/v2`）
+- テスト / Lint / RSpec /  セキュリティ: RuboCop / Brakeman
+
+## セットアップ / よく使うコマンド
+
+```bash
+# Rubyバージョン確認（.ruby-versionに従いrbenvが自動選択）
+rbenv exec ruby -v
+
+# gemインストール（Bundler 2.4.22、Gemfile.lockのBUNDLED WITHと一致させる）
+bundle install
+
+# Docker（MySQL 5.7 / TiDB / Redis）起動
+docker-compose up -d
+
+# DB作成・マイグレーション
+bin/rails db:create
+bin/rails db:migrate
+
+# サーバ起動
+bin/rails server
+
+# テスト
+bundle exec rspec
+bundle exec rspec spec/requests   # ディレクトリ指定も可
+
+# Lint
+bundle exec rubocop
+bundle exec rubocop -A            # 自動修正
+
+# セキュリティスキャン
+bundle exec brakeman
+bundle exec brakeman -o brakeman_report.txt   # ページャで止まる場合はファイル出力
+```
+
+## 既知の注意点・落とし穴
+
+- **concurrent-ruby は `1.3.4` に固定** (`Gemfile`)。1.3.5以降は `uninitialized constant ActiveSupport::LoggerThreadSafeLevel::Logger` を引き起こす既知の非互換があるため、`bundle update` でこの固定を外さないこと。
+- **Ruby 2.7 / Rails 6.0 はEOL**のため、Brakemanの `Unmaintained Dependency` 警告が常に2件表示される。これは意図した構成による既知の警告であり、対応不要（新規の警告と混同しないよう注意）。
+- **`mysql:5.7` はArm64ネイティブイメージが無い**ため、`docker-compose.yml` で `platform: linux/amd64` を指定してエミュレーション実行している。Apple Silicon環境での起動が遅い/失敗する場合はまずこの設定を疑う。
+
+## コーディング規約・レビュー観点
+
+- RuboCopの設定（`.rubocop.yml`）に従う: `TargetRubyVersion: 2.7`、`NewCops: enable`。`Style/Documentation` は無効なのでdocコメント必須ではない。
+- 既存の構成パターンに従う: `app/controllers/api/base_controller.rb` を共通の基底とし、`app/controllers/api/v1/`, `api/v2/` のようにバージョンごとの名前空間で分ける。
+- 新機能を追加する際は対応するRSpec（`spec/requests/` など）を書く。
+- コードを変更したら、コミット前に `bundle exec rubocop` と `bundle exec rspec` を実行して確認する。
+- 過剰な抽象化を避ける。学習用リポジトリなので、シンプルで読みやすいRailsの慣習的な書き方を優先する。
+
+## Skillの置き場所
+
+- **Claude Code**: `.claude/skills/<skill-name>/SKILL.md`（frontmatterに`name`/`description`、`/skill-name` で呼び出し）
+- **Cursor**: `.cursor/rules/<rule-name>.mdc`
+- 両ツールで同じ振る舞いを再現したい場合は、内容の一次情報をこのCLAUDE.mdや共有ドキュメント（例: `docs/`）に書き、各ツール向けファイルはそれを要約・参照する形にすると重複管理を避けやすい。

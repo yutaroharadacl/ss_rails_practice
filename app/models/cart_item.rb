@@ -3,5 +3,6 @@
 class CartItem < ApplicationRecord
   belongs_to :cart
 
+  validates :product_id, presence: true
   validates :quantity, numericality: { only_integer: true, greater_than: 0 }
 end

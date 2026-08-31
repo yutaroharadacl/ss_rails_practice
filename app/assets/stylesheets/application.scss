@@ -1,2 +1,68 @@
 @import "bootstrap-sprockets";
 @import "bootstrap";
+
+$sidebar-menu-bg: #07256c;
+$sidebar-menu-hover-bg: rgba(255, 255, 255, 0.15);
+$sidebar-menu-active-bg: rgba(255, 255, 255, 0.25);
+// Bootstrapのグリッドgutterの半分（.col-sm-3の左右padding）を打ち消す量
+$sidebar-menu-gutter: $grid-gutter-width / 2;
+
+.container-fluid > .row {
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 100vh;
+}
+
+.sidebar-menu {
+  background-color: $sidebar-menu-bg;
+
+  // .col-sm-3が左右$grid-gutter-width/2のpaddingを持つため、その分マイナスマージンで
+  // 列の端まで広げる（中項目側の`&__children`と同じ考え方）
+  .nav {
+    margin: 0 (-$sidebar-menu-gutter);
+  }
+
+  a {
+    color: #fff;
+    line-height: 1.8;
+  }
+
+  // 左右にpaddingを付けるとハイライトが端まで届かなくなるため、
+  // 上下方向のみ余白を持たせる
+  .nav > li {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+
+    &.active > a {
+      background-color: $sidebar-menu-active-bg;
+    }
+  }
+
+  // Bootstrapの `.nav > li > a:hover, :focus` (背景色#eee) より
+  // 詳細度を上げて確実に上書きするため、`.nav > li > a` まで含めて指定する
+  .nav > li > a:hover,
+  .nav > li > a:focus {
+    color: #fff;
+    background-color: $sidebar-menu-hover-bg;
+  }
+
+  &__children {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+    background-color: darken($sidebar-menu-bg, 10%);
+
+    li.active > a {
+      background-color: $sidebar-menu-active-bg;
+    }
+
+    a {
+      display: block;
+      padding-left: 30px;
+
+      &:hover,
+      &:focus {
+        background-color: $sidebar-menu-hover-bg;
+      }
+    }
+  }
+}

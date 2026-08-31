@@ -7,4 +7,9 @@
     = csp_meta_tag
     = stylesheet_link_tag    'application', media: 'all'
   %body
-    = yield
+    .container-fluid
+      .row
+        .col-sm-3.sidebar-menu
+          = render 'layouts/sidebar'
+        .col-sm-9
+          = yield

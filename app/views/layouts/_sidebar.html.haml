@@ -1,0 +1,12 @@
+%ul.nav.nav-pills.nav-stacked
+  - current_major = current_major_menu_item
+  - SidebarMenu::MENU_ITEMS.each do |major|
+    - next if major[:children].blank?
+    %li{class: ('active' if major.equal?(current_major))}
+      = link_to major[:name], major[:children].first[:path]
+
+      - if major.equal?(current_major) && major[:children].length > 1
+        %ul.sidebar-menu__children
+          - major[:children].each do |child|
+            %li{class: ('active' if current_page?(child[:path]))}
+              = link_to child[:name], child[:path]

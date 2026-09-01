@@ -6,13 +6,7 @@ class CartItemsController < ApplicationController
     item = current_cart.cart_items.find_or_initialize_by(product_id: cart_item_params[:product_id])
     # アイテムの数量を送られてきたquantity分増加、to_iは数値にするという意味
     item.quantity += cart_item_params[:quantity].to_i
-
-    if item.save
-      # 保存に成功したら画面は元の画面になる。失敗した時にはカート画面へ遷移
-      redirect_back fallback_location: cart_path, notice: 'カートに追加しました'
-    else
-      redirect_back fallback_location: cart_path, alert: item.errors.full_messages.join(', ')
-    end
+    redirect_after_save(item, notice: 'カートに追加しました')
   end
 
   def update
@@ -20,11 +14,7 @@ class CartItemsController < ApplicationController
     item = current_cart.cart_items.find(params[:id])
     # quantityを変える
     item.quantity = cart_item_params[:quantity].to_i
-    if item.save
-      redirect_back fallback_location: cart_path
-    else
-      redirect_back fallback_location: cart_path, alert: item.errors.full_messages.join(', ')
-    end
+    redirect_after_save(item)
   end
 
   def destroy
@@ -37,5 +27,14 @@ class CartItemsController < ApplicationController
 
   def cart_item_params
     params.require(:cart_item).permit(:product_id, :quantity)
+  end
+
+  def redirect_after_save(item, notice: nil)
+    if item.save
+      # 保存に成功したら画面は元の画面になる。失敗した時にはカート画面へ遷移
+      redirect_back fallback_location: cart_path, notice: notice
+    else
+      redirect_back fallback_location: cart_path, alert: item.errors.full_messages.join(', ')
+    end
   end
 end

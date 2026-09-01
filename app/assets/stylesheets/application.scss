@@ -66,3 +66,38 @@ $sidebar-menu-gutter: $grid-gutter-width / 2;
     }
   }
 }
+
+// 数量の増減UI。
+// Bootstrapの`.input-group`は`display: table`のため親（td）の幅いっぱいに広がり、
+// 余った幅が中央のセルに配分されて+ボタンが右に離れてしまう。
+// inline-flexに上書きして「中身の幅ぴったり」に収める。
+.input-group.quantity-group {
+  display: inline-flex;
+  align-items: center;
+
+  // Bootstrapが子要素に当てている`display: table-cell` / `width: 1%` / `float`を打ち消す
+  > .input-group-btn,
+  > .quantity-input-wrap {
+    display: block;
+    width: auto;
+    float: none;
+  }
+
+  .form-control {
+    width: 60px;
+    float: none;
+
+    // 独自の +/- ボタンを使うため、ブラウザ標準の上下スピンボタンを消す
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    -moz-appearance: textfield;
+  }
+}
+
+.table-middle > tbody > tr > td {
+  vertical-align: middle;
+}

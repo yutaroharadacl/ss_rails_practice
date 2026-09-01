@@ -1,2 +1,27 @@
-%h1 Carts#show
-%p Find me in app/views/carts/show.html.haml
+%h1 ショッピングカート
+- if @cart.cart_items.empty?
+  %p カートは空です
+- else
+  %table.table.table-middle
+    %thead
+      %tr
+        %th 商品名
+        %th 数量
+        %th 価格
+        %th 操作
+    %tbody
+      - @cart.cart_items.each do |item|
+        %tr
+          %td ダミーアイテム
+          %td
+            = form_with model: item, url: cart_item_path(item), method: :patch do |f|
+              .input-group.quantity-group
+                %span.input-group-btn
+                  %button.btn.btn-default{type: 'button', onclick: "this.form.querySelector('input[type=number]').stepDown(); this.form.submit();"} -
+                %span.quantity-input-wrap
+                  = f.number_field :quantity, value: item.quantity, min: 1, class: 'form-control text-center', onchange: 'this.form.submit()'
+                %span.input-group-btn
+                  %button.btn.btn-default{type: 'button', onclick: "this.form.querySelector('input[type=number]').stepUp(); this.form.submit();"} +
+          %td 価格
+          %td
+            = button_to '削除', cart_item_path(item), method: :delete, class: 'btn btn-danger'

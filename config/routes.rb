@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  namespace :admin do
+    resources :orders, only: %i[index show update]
+    resources :order_items, only: [:update]
+  end
   root to: 'home#index'
 
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html

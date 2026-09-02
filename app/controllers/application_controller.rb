@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
+  # helper_methodを書くとViewからも参照できるようになる
   helper_method :current_cart
 
   private
 
   def current_cart
+    # @current_cartがnilであれば代入。こうすることで同一リクエスト内での重複呼び出しを防ぐ
     @current_cart ||= find_current_cart
   end
 
@@ -16,6 +18,7 @@ class ApplicationController < ActionController::Base
 
     # なければ新しく作成してセッションに保存
     new_cart = Cart.create!
+    # セッションというハッシュのcart_idというキーにnew_cart.idを保存
     session[:cart_id] = new_cart.id
     new_cart
   end

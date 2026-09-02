@@ -3,6 +3,7 @@
 Rails.application.routes.draw do
   root to: 'home#index'
   resource :cart, only: [:show]
+  # %iは中身中身をハッシュにしてくれる[:create, :update, :destroy]のようになる
   resources :cart_items, only: %i[create update destroy]
 
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html

@@ -1,3 +1,12 @@
-# Place all the behaviors and hooks related to the matching controller here.
-# All this logic will automatically be available in application.js.
-# You can use CoffeeScript in this file: http://coffeescript.org/
+$(document).on 'click', '.js-quantity-up', ->
+  input = $(this).closest('.input-group').find('input[type=number]')
+  input[0].stepUp()
+  input.closest('form').submit()
+
+$(document).on 'click', '.js-quantity-down', ->
+  input = $(this).closest('.input-group').find('input[type=number]')
+  input[0].stepDown()
+  input.closest('form').submit()
+
+$(document).on 'change', '.js-quantity-input', ->
+  $(this).closest('form').submit()

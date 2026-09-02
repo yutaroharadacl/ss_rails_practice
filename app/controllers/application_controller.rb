@@ -2,9 +2,13 @@
 
 class ApplicationController < ActionController::Base
   # helper_methodを書くとViewからも参照できるようになる
-  helper_method :current_cart
+  helper_method :current_cart, :existing_cart
 
   private
+
+  def existing_cart
+    @existing_cart ||= Cart.find_by(id: session[:cart_id])
+  end
 
   def current_cart
     # @current_cartがnilであれば代入。こうすることで同一リクエスト内での重複呼び出しを防ぐ

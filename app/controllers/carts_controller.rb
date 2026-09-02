@@ -2,6 +2,6 @@
 
 class CartsController < ApplicationController
   def show
-    @cart = current_cart
+    @cart = existing_cart
   end
 end

@@ -3,7 +3,7 @@
 class CartItemsController < ApplicationController
   def create
     # 現在のカートにすでに対象の商品が登録されていれば数量を増加させる。それ以外の場合は新規作成
-    # find_or_initialize_byは存在していればそれをitemに格納、存在していなければ作成して格納してくれる
+    # find_or_initialize_byは存在していればそれをitemに格納、存在していなければ作成(new)してitemに格納してくれる
     item = current_cart.cart_items.find_or_initialize_by(product_id: cart_item_params[:product_id])
     # アイテムの数量を送られてきたquantity分増加、to_iは数値にするという意味
     item.quantity += cart_item_params[:quantity].to_i

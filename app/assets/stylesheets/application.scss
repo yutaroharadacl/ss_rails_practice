@@ -1,9 +1,13 @@
-@import "bootstrap-sprockets";
-@import "bootstrap";
-
 $sidebar-menu-bg: #07256c;
 $sidebar-menu-hover-bg: rgba(255, 255, 255, 0.15);
 $sidebar-menu-active-bg: rgba(255, 255, 255, 0.25);
+$text-red: #f0908d;
+
+@import "bootstrap-sprockets";
+@import "bootstrap";
+@import "admin/orders";
+@import "common";
+
 // Bootstrapのグリッドgutterの半分（.col-sm-3の左右padding）を打ち消す量
 $sidebar-menu-gutter: $grid-gutter-width / 2;
 

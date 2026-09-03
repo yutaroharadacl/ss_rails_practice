@@ -1,0 +1,12 @@
+// app/assets/stylesheets/common.scss
+input[type="number"] {
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+
+.text-color-red {
+    color: $text-red
+}

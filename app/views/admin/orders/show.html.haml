@@ -1,2 +1,80 @@
-%h1 Admin::Orders#show
-%p Find me in app/views/admin/orders/show.html.haml
+%h1 受注管理
+
+- active_tab = params[:tab] == 'items' ? 'items' : 'basic'
+%ul.nav.nav-tabs{role: 'tablist'}
+  %li{role: 'presentation', class: ('active' if active_tab == 'basic')}
+    %a{href: '#tab-basic', data: { toggle: 'tab' }} 基本情報
+  %li{role: 'presentation', class: ('active' if active_tab == 'items')}
+    %a{href: '#tab-items', data: { toggle: 'tab' }} 受注商品管理
+
+.tab-content
+  #tab-basic.tab-pane{class: ('active' if active_tab == 'basic')}
+    =render layout: 'panel', locals: { title: '基本情報', action: (@order.status == 'new' ? button_to('完了にする', admin_order_path(@order), method: :patch, params: { order: { status: 'complete' } }, class: 'btn btn-primary') : nil) } do
+      =render 'panel_row', label: 'ID', value: @order.id
+      =render 'panel_row', label: '受注番号', value: 'ダミー'
+      =render 'panel_row', label: '対応状況', value: orders_status_label(@order_status)
+
+    -# TODO: ユーザーテーブルから引っ張る
+    =render layout: 'panel', locals: { title: '購入者情報' } do
+      =render 'panel_row', label: '顧客番号', value: 'ダミー'
+      =render 'panel_row', label: '名前', value: @order.customer_name
+      =render 'panel_row', label: '名前(カナ)', value: 'ダミー'
+      =render 'panel_row', label: '住所', value: 'ダミー'
+      =render 'panel_row', label: '電話番号', value: 'ダミー'
+      =render 'panel_row', label: 'FAX', value: 'ダミー'
+      =render 'panel_row', label: 'メールアドレス', value: @order.customer_email
+
+    =render layout: 'panel', locals: { title: '受注商品情報' } do
+      %div
+
+  #tab-items.tab-pane{class: ('active' if active_tab == 'items')}
+    =render layout: 'panel', locals: { title: '受注商品管理' } do
+      =form_with model: [:admin, @order], method: :patch, local: true do |f|
+        = hidden_field_tag :tab, 'items'
+        %fieldset{disabled: @order.status == 'complete'}
+          %table.table.table-middle
+            %thead
+              %tr
+                %th 商品コード
+                %th 商品名
+                %th SKUコード
+                %th 単価
+                %th 個数
+                %th 削除
+                %th 小計
+            %tbody
+              -# TODO: productテーブルとの紐付けが完了したら適宜入れていく。一旦ダミー
+              = f.fields_for :order_items do |item_form|
+                %tr
+                  %td ダミー
+                  %td ダミー
+                  %td ダミー
+                  %td
+                    = item_form.number_field :price, value: item_form.object.price.to_i
+                    円
+                  %td
+                    = item_form.number_field :quantity
+                    個
+                  %td= item_form.check_box :_destroy
+                  %td
+                    -# number_with_delimiter 3桁ごとに区切り文字を入れてくれる
+                    = number_with_delimiter(item_form.object.subtotal.to_i)
+                    円
+              %tr
+                %td.text-right{colspan: 6} 小計
+                %td
+                  = number_with_delimiter(@order.subtotal.to_i)
+                  円
+              %tr
+                %td.text-right{colspan:6} 消費税
+                %td
+                  = number_with_delimiter(@order.tax.to_i)
+                  円
+              %tr.total-row
+                %td.text-right{colspan:6} 合計
+                %td.text-color-red
+                  = number_with_delimiter(@order.total.to_i)
+                  円
+          .text-right        
+            = f.submit '保存する', class: 'btn btn-primary' 
+

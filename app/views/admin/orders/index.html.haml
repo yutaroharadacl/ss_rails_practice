@@ -1,2 +1,30 @@
-%h1 Admin::Orders#index
-%p Find me in app/views/admin/orders/index.html.haml
+%h1 受注管理
+
+%table.table
+  %thead
+    %tr
+      %th ID
+      %th 受注日
+      %th 受注番号
+      %th 顧客番号
+      %th 名前
+      %th 受注種別
+      %th 対応状況
+      %th 支払い方法
+      %th 決済状況
+      %th 合計
+      %th 操作
+  %tbody
+    - @orders.each do |order|
+      %tr
+        %td= order.id
+        %td
+        %td
+        %td
+        %td= order.customer_name
+        %td
+        %td= orders_status_label(order.status)
+        %td
+        %td
+        %td
+        %td= link_to "詳細", admin_order_path(order)

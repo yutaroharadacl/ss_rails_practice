@@ -13,18 +13,18 @@ module Admin
     def show; end
 
     def update
-      @order.status = order_params[:status]
-      if @order.save
-        redirect_back fallback_location: admin_order_path(@order)
+      if @order.update(order_params)
+        redirect_to admin_order_path(@order, tab: params[:tab])
       else
-        redirect_back fallback_location: admin_order_path(@order), alert: @order.errors.full_messages.join(', ')
+        redirect_to admin_order_path(@order, tab: params[:tab]), alert: @order.errors.full_messages.join(', ')
       end
     end
 
     private
 
     def order_params
-      params.require(:order).permit(:status)
+      # _destroyは、Railsが「このネストしたレコードを削除対象とする」ために内部的に使う特別なキー名
+      params.require(:order).permit(:status, order_items_attributes: %i[id price quantity _destroy])
     end
 
     def set_order

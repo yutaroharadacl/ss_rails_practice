@@ -1,8 +1,7 @@
 class CreateOrders < ActiveRecord::Migration[6.0]
   def change
     create_table :orders do |t|
-      t.string :product_name
-      t.integer :quantity
+      t.string :payment_status, null: false, default: 'pending'
 
       t.timestamps
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class OrdersController < ApplicationController
 
   def new
@@ -11,13 +13,15 @@ class OrdersController < ApplicationController
       return
     end
 
-    order = Order.create!(payment_status: 'pending')
-    cart.cart_items.each do |item|
-      order.order_items.create!(product_id: item.product_id, quantity: item.quantity)
+    order = nil
+    ActiveRecord::Base.transaction do
+      order = Order.create!(payment_status: 'pending')
+      cart.cart_items.each do |item|
+        order.order_items.create!(product_id: item.product_id, quantity: item.quantity)
+      end
+      order.update!(payment_status: 'paid')
+      cart.destroy
     end
-
-    order.update!(payment_status: 'paid')
-    cart.destroy
     session.delete(:cart_id)
 
     redirect_to order_path(order)

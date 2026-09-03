@@ -19,15 +19,6 @@ class SidebarMenu
           path: '/cart'
         }
       ]
-    },
-    {
-      name: '注文',
-      children: [
-        {
-          name: '注文',
-          path: '/orders'
-        }
-      ]
     }
   ].freeze
 end

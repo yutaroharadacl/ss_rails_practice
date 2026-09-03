@@ -1,0 +1,19 @@
+%h1 注文確認
+
+- if @cart.nil? || @cart.cart_items.empty?
+  %p カートは空です
+  = link_to 'カートへ戻る', cart_path
+- else
+  %table.table
+    %thead
+      %tr
+        %th 商品名
+        %th 数量
+    %tbody
+      - @cart.cart_items.each do |item|
+        %tr
+          %td ダミーアイテム
+          %td= item.quantity
+  %p
+    合計金額: #{number_to_currency(@cart.total_price)}
+  = button_to '注文を確定する', orders_path, method: :post, class: 'btn btn-primary'

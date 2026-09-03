@@ -2,7 +2,7 @@
 
 Rails.application.routes.draw do
   root to: 'home#index'
-  resources :orders, only: %i[index]
+  resources :orders, only: %i[new create show]
   resource :cart, only: %i[show]
   # %iは中身中身をシンボルの配列にしてくれる[:create, :update, :destroy]のようになる
   resources :cart_items, only: %i[create update destroy]

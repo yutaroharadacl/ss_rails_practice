@@ -10,6 +10,15 @@ class SidebarMenu
           path: '/'
         }
       ]
+    },
+    {
+      name: 'Cart',
+      children: [
+        {
+          name: 'Cart',
+          path: '/cart'
+        }
+      ]
     }
   ].freeze
 end

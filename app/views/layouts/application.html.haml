@@ -13,4 +13,8 @@
         .col-sm-2.sidebar-menu
           = render 'layouts/sidebar'
         .col-sm-8
+          - flash.each do |type, message|
+            - css_class = { 'notice' => 'success', 'alert' => 'danger' }[type]
+            .alert{class: "alert-#{css_class}"}
+              = message
           = yield

@@ -6,6 +6,9 @@ Rails.application.routes.draw do
     resources :order_items, only: [:update]
   end
   root to: 'home#index'
+  resource :cart, only: [:show]
+  # %iは中身中身をシンボルの配列にしてくれる[:create, :update, :destroy]のようになる
+  resources :cart_items, only: %i[create update destroy]
 
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   namespace :api do

@@ -1,0 +1,9 @@
+ja:
+  number:
+    currency:
+      format:
+        format: "%u%n"
+        unit: "¥"
+        precision: 0
+        separator: "."
+        delimiter: ","

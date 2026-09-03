@@ -25,3 +25,7 @@
           %td 価格
           %td
             = button_to '削除', cart_item_path(item), method: :delete, class: 'btn btn-danger'
+  .cart-summary
+    %p
+      合計金額: #{number_to_currency(@cart.total_price)}
+    = link_to '購入する', '/order', class: 'btn btn-primary'

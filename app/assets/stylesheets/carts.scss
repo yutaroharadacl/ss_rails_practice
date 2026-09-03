@@ -1,0 +1,11 @@
+.cart-summary {
+    display: flex;
+    gap: 5px;
+    justify-content: right;
+    align-items: center;
+
+    p {
+        font-size: large;
+        margin: 0;
+    }
+}

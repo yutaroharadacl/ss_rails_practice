@@ -12,6 +12,15 @@ class SidebarMenu
       ]
     },
     {
+      name: 'Cart',
+      children: [
+        {
+          name: 'Cart',
+          path: '/cart'
+        }
+      ]
+    },
+    {
       name: '注文',
       children: [
         {

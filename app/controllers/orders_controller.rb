@@ -1,7 +1,4 @@
 class OrdersController < ApplicationController
-  def index
-    @orders = Order.all
-  end
 
   def new
     @cart = existing_cart

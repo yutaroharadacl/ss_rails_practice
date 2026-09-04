@@ -28,4 +28,4 @@
   .cart-summary
     %p
       合計金額: #{number_to_currency(@cart.total_price)}
-    = link_to 'レジに進む', '/order', class: 'btn btn-primary'
+    = link_to 'レジに進む', '/orders/new', class: 'btn btn-primary'

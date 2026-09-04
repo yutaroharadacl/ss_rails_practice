@@ -18,7 +18,8 @@
     - @orders.each do |order|
       %tr
         %td= order.id
-        %td
+        -# strftimeで日時を好きなフォーマットに変えられる
+        %td= order.created_at.strftime('%Y/%m/%d %H:%M:%S') 
         %td
         %td
         %td= order.customer_name

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class CartItemsController < ApplicationController
-  rescue_from ActiveRecord::RecordNotFound do |e|
-    redirect_to cart_path, alert: e.message
+  rescue_from ActiveRecord::RecordNotFound do |_e|
+    redirect_to cart_path, alert: t('flash.cart_items.error.not_found')
   end
 
   def create

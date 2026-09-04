@@ -9,6 +9,6 @@ class Cart < ApplicationRecord
 
   def total_price
     # 1.1をかけると結果もfloatになるので金額計算にはそぐわない。なのでBigDecimalを利用する
-    total_price = cart_items.sum { |item| item.quantity * DUMMY_PRICE * BigDecimal(TAX_RATE) }
+    cart_items.sum { |item| item.quantity * DUMMY_PRICE * BigDecimal(TAX_RATE) }
   end
 end

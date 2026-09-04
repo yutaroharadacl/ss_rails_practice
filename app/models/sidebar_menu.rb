@@ -19,6 +19,15 @@ class SidebarMenu
           path: '/cart'
         }
       ]
+    },
+    {
+      name: '管理',
+      children: [
+        {
+          name: '受注管理',
+          path: '/admin/orders'
+        }
+      ]
     }
   ].freeze
 end

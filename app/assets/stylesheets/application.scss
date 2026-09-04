@@ -12,6 +12,10 @@ $text-red: #f0908d;
 // Bootstrapのグリッドgutterの半分（.col-sm-3の左右padding）を打ち消す量
 $sidebar-menu-gutter: $grid-gutter-width / 2;
 
+.text-color-red {
+  color: $text-red
+}
+
 .container-fluid > .row {
   display: flex;
   flex-wrap: wrap;

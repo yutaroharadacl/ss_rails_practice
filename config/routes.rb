@@ -3,7 +3,6 @@
 Rails.application.routes.draw do
   namespace :admin do
     resources :orders, only: %i[index show update]
-    resources :order_items, only: [:update]
   end
   root to: 'home#index'
   resource :cart, only: [:show]

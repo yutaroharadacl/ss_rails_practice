@@ -1,0 +1,6 @@
+ja: 
+  activerecord:
+    attributes:
+      cart_item:
+        product_id: 商品ID
+        quantity: 数量

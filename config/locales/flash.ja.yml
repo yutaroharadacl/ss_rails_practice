@@ -1,0 +1,7 @@
+ja:
+  flash:
+    cart_items:
+      create:
+        notice: "カートに追加しました"
+      error:
+        not_found: "対象のデータが見つかりませんでした。"

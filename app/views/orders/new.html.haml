@@ -4,16 +4,22 @@
   %p カートは空です
   = link_to 'カートへ戻る', cart_path
 - else
-  %table.table
+  %table.table.table-middle
     %thead
       %tr
         %th 商品名
         %th 数量
+        %th 単価
     %tbody
       - @cart.cart_items.each do |item|
         %tr
           %td ダミーアイテム
           %td= item.quantity
-  %p
-    合計金額: #{number_to_currency(@cart.total_price)}
-  = button_to '注文を確定する', orders_path, method: :post, class: 'btn btn-primary'
+          -# productテーブルが完成次第変える
+          %td 単価
+        %tr
+          %td.text-right{colspan: 2} 小計
+          %td= number_to_currency(@cart.total_price)
+
+  .text-right
+    = button_to '注文を確定する', orders_path, method: :post, class: 'btn btn-primary'

@@ -36,11 +36,18 @@ class CartItemsController < ApplicationController
   end
 
   def redirect_after_save(item, notice: nil)
+    destination = safe_return_path(params[:return_to])
     if item.save
       # 保存に成功したら画面は元の画面になる。失敗した時にはカート画面へ遷移
-      redirect_to cart_path, notice: notice
+      redirect_to destination, notice: notice
     else
-      redirect_to cart_path, alert: item.errors.full_messages.join(', ')
+      redirect_to destination, alert: item.errors.full_messages.join(', ')
     end
+  end
+
+  def safe_return_path(path)
+    # オープンリダイレクト対策として、遷移先を許可したパスのみに限定する
+    allowed_return_paths = [cart_path]
+    allowed_return_paths.include?(path) ? path : cart_path
   end
 end

@@ -1,0 +1,11 @@
+%td
+  = form_with model: item, url: cart_item_path(item), method: :patch do |f|
+    -# request.pathを隠しフィールドとして持たせることで、リダイレクト先を指定するときに利用できる
+    = hidden_field_tag :return_to, request.path
+    .input-group.quantity-group
+      %span.input-group-btn
+        %button.btn.btn-default.js-quantity-down{type: 'button'} -
+      %span.quantity-input-wrap
+        = f.number_field :quantity, value: item.quantity, min: 1, class: 'form-control text-center js-quantity-input'
+      %span.input-group-btn
+        %button.btn.btn-default.js-quantity-up{type: 'button'} +

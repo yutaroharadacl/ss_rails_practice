@@ -77,6 +77,15 @@ bundle exec brakeman -o brakeman_report.txt   # ページャで止まる場合�
 - コードを変更したら、コミット前に `bundle exec rubocop` と `bundle exec rspec` を実行して確認する。
 - 過剰な抽象化を避ける。学習用リポジトリなので、シンプルで読みやすいRailsの慣習的な書き方を優先する。
 
+## コードレビューで指摘された規約（このリポジトリ固有）
+
+現場のレビューで指摘された、このリポジトリ・チーム固有の規約。一般的なRailsの知識（`find`と`find_by`の使い分け、`redirect_back`と`redirect_to`の違いなど）はここに含めない。
+
+- **flashメッセージはハードコードせず `config/locales/flash.ja.yml` に定義する。** `flash.<controller>.<action>.notice` / `flash.<controller>.<action>.error.<key>` の階層で定義し、コントローラからは `t('flash....')` で呼び出す（例: `app/controllers/cart_items_controller.rb`）。
+- **モデルのバリデーションエラーで表示される属性名は `config/locales/models.ja.yml` に論理名を定義する。** `activerecord.attributes.<model>.<attribute>` の形式（例: `cart_item.product_id: 商品ID`）で定義しておくと、物理名がそのままエラーメッセージに出るのを防げる。
+- **`config/locales/*.yml` などのテキストファイルは末尾に改行を入れる。**
+- **マイグレーションで `create_table` / `drop_table` を書く際は、`change` の代わりに `up` / `down` を使い、`data_source_exists?` で存在チェックしてから実行する。** rollbackや再実行時の安全性のため。
+
 ## Skillの置き場所
 
 - **Claude Code**: `.claude/skills/<skill-name>/SKILL.md`（frontmatterに`name`/`description`、`/skill-name` で呼び出し）

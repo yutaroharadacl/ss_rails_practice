@@ -1,0 +1,23 @@
+%h1 商品一覧
+
+- if @products.empty?
+  %p 公開中の商品はありません
+- else
+  %table.table
+    %thead
+      %tr
+        %th 商品名
+        %th 店舗
+        %th 価格
+        %th 在庫
+    %tbody
+      - @products.each do |product|
+        %tr
+          %td= product.name
+          %td= product.store.name
+          %td= number_to_currency(product.sku&.price)
+          %td
+            - if product.sku&.in_stock?
+              = product.sku.stock_quantity
+            - else
+              売り切れ

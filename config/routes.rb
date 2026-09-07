@@ -5,6 +5,8 @@ Rails.application.routes.draw do
   resource :cart, only: [:show]
   # %iは中身中身をシンボルの配列にしてくれる[:create, :update, :destroy]のようになる
   resources :cart_items, only: %i[create update destroy]
+  # ユーザー側：公開商品の一覧
+  resources :products, only: [:index]
 
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   namespace :api do
@@ -16,4 +18,11 @@ Rails.application.routes.draw do
       get 'health', to: 'health#index'
     end
   end
+
+  # 店舗側：商品 CRUD
+ namespace :admin do
+  resources :stores, only: [] do
+    resources :products
+   end
+ end
 end

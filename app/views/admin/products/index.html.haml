@@ -1,0 +1,27 @@
+%h1
+  = @store.name
+  の商品一覧
+
+%p= link_to '新規登録', new_admin_store_product_path(@store), class: 'btn btn-primary'
+
+- if @products.empty?
+  %p 商品がありません
+- else
+  %table.table
+    %thead
+      %tr
+        %th 商品名
+        %th 公開
+        %th 価格
+        %th 在庫
+        %th 操作
+    %tbody
+      - @products.each do |product|
+        %tr
+          %td= link_to product.name, admin_store_product_path(@store, product)
+          %td= product.published? ? '公開' : '非公開'
+          %td= number_to_currency(product.sku&.price)
+          %td= product.sku&.stock_quantity
+          %td
+            = link_to '編集', edit_admin_store_product_path(@store, product), class: 'btn btn-default btn-sm'
+            = button_to '削除', admin_store_product_path(@store, product), method: :delete, class: 'btn btn-danger btn-sm', data: { confirm: '削除しますか？' }

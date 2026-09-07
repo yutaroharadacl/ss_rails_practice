@@ -54,11 +54,11 @@ RSpec.describe 'Admin::Orders', type: :request do
       end
 
       it 'order_itemを削除できる' do
-        expect {
+        expect do
           patch admin_order_path(order), params: { order: { order_items_attributes: {
-            '0' => { id: order_item.id, _destroy: '1'}
-          }}}
-        }.to change(OrderItem, :count).by(-1)
+            '0' => { id: order_item.id, _destroy: '1' }
+          } } }
+        end.to change(OrderItem, :count).by(-1)
       end
     end
 
@@ -80,11 +80,11 @@ RSpec.describe 'Admin::Orders', type: :request do
       end
 
       it 'order_itemを削除できない' do
-        expect {
+        expect do
           patch admin_order_path(order), params: { order: { order_items_attributes: {
-            '0' => { id: order_item.id, _destroy: '1'}
-          }}}
-        }.to change(OrderItem, :count).by(0)
+            '0' => { id: order_item.id, _destroy: '1' }
+          } } }
+        end.to change(OrderItem, :count).by(0)
       end
     end
   end

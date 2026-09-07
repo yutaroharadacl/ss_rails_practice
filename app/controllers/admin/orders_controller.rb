@@ -14,9 +14,9 @@ module Admin
 
     def update
       if @order.update(order_params)
-        redirect_to admin_order_path(@order, tab: params[:tab])
+        redirect_to admin_order_path(@order, anchor: params[:tab])
       else
-        redirect_to admin_order_path(@order, tab: params[:tab]), alert: @order.errors.full_messages.join(', ')
+        redirect_to admin_order_path(@order, anchor: params[:tab]), alert: @order.errors.full_messages.join(', ')
       end
     end
 
@@ -31,11 +31,11 @@ module Admin
       @order = Order.find(params[:id])
     end
 
-    # sutatusがcompleteの場合は編集させない
+    # 編集不可（complete）の場合は弾く
     def check_order_completed
-      return unless @order.status == 'complete'
+      return if @order.editable?
 
-      redirect_to admin_order_path(@order), alert: '完了済みの受注は編集できません'
+      redirect_to admin_order_path(@order, anchor: params[:tab]), alert: '完了済みの受注は編集できません'
     end
   end
 end

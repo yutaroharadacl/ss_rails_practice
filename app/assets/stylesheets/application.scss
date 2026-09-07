@@ -1,12 +1,20 @@
-@import "bootstrap-sprockets";
-@import "bootstrap";
-@import "carts";
-
 $sidebar-menu-bg: #07256c;
 $sidebar-menu-hover-bg: rgba(255, 255, 255, 0.15);
 $sidebar-menu-active-bg: rgba(255, 255, 255, 0.25);
+$text-red: #f0908d;
+
+@import "bootstrap-sprockets";
+@import "bootstrap";
+@import "admin/orders";
+@import "carts";
+@import "common";
+
 // Bootstrapのグリッドgutterの半分（.col-sm-3の左右padding）を打ち消す量
 $sidebar-menu-gutter: $grid-gutter-width / 2;
+
+.text-color-red {
+  color: $text-red
+}
 
 .container-fluid > .row {
   display: flex;
@@ -87,15 +95,7 @@ $sidebar-menu-gutter: $grid-gutter-width / 2;
   .form-control {
     width: 60px;
     float: none;
-
-    // 独自の +/- ボタンを使うため、ブラウザ標準の上下スピンボタンを消す
-    &::-webkit-inner-spin-button,
-    &::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-
-    -moz-appearance: textfield;
+    // スピンボタンの非表示は _common.scss（input[type="number"]全般向け）に一本化済み
   }
 }
 

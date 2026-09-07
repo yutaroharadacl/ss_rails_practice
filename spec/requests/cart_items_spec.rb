@@ -57,9 +57,9 @@ RSpec.describe 'CartItems', type: :request do
 
       reset! # セッションをリセット
 
-      expect do
-        patch cart_item_path(item), params: { cart_item: { quantity: 3 } }
-      end.to raise_error(ActiveRecord::RecordNotFound)
+      patch cart_item_path(item), params: { cart_item: { quantity: 3 } }
+      expect(item.reload.quantity).to eq(2)
+      expect(response).to redirect_to(cart_path)
     end
   end
 
@@ -78,9 +78,10 @@ RSpec.describe 'CartItems', type: :request do
       item = CartItem.last
 
       reset! # セッションをリセット
-      expect do
-        delete cart_item_path(item)
-      end.to raise_error(ActiveRecord::RecordNotFound)
+
+      delete cart_item_path(item)
+      expect(CartItem.count).to eq(1)
+      expect(response).to redirect_to(cart_path)
     end
   end
 end

@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  namespace :admin do
+    resources :orders, only: %i[index show update]
+  end
   root to: 'home#index'
   resources :orders, only: %i[new create show]
   resource :cart, only: %i[show]

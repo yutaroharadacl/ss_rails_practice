@@ -9,6 +9,6 @@ class Cart < ApplicationRecord
   def total_price
     # Floatを経由すると誤差が出るため、税率(TaxRate::PERCENT)をBigDecimalに変換してから掛ける
     tax_multiplier = 1 + (BigDecimal(TaxRate::PERCENT) / 100)
-    cart_items.sum { |item| item.quantity * DUMMY_PRICE * tax_multiplier }
+    cart_items.sum { |item| item.quantity * item.unit_price * tax_multiplier }
   end
 end

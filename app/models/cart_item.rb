@@ -2,6 +2,11 @@
 
 class CartItem < ApplicationRecord
   belongs_to :cart
+  belongs_to :product
+
+  def unit_price
+    product.sku.price
+  end
 
   validates :product_id, presence: true
   # numericality: 数値化どうかを確かめる

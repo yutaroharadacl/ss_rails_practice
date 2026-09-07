@@ -47,6 +47,10 @@
           %td
             - if product.sku&.in_stock?
               = product.sku.stock_quantity
+              = form_with url: cart_items_path, method: :post, local: true do
+                = hidden_field_tag 'cart_item[product_id]', product.id
+                = hidden_field_tag 'cart_item[quantity]', 1
+                = submit_tag 'カートに入れる', class: 'btn btn-primary btn-sm'
             - else
-              売り切れ
+              %span.text-muted 売り切れ
   = render 'pagination'

@@ -1,0 +1,6 @@
+.panel.panel-default
+  .order-panel-heading
+    %h3= title
+    = action if defined?(action) && action
+  .panel-body
+    = yield

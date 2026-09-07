@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  namespace :admin do
+    resources :orders, only: %i[index show update]
+  end
   root to: 'home#index'
   resource :cart, only: [:show]
   # %iは中身中身をシンボルの配列にしてくれる[:create, :update, :destroy]のようになる

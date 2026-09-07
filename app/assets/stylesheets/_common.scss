@@ -1,0 +1,11 @@
+// app/assets/stylesheets/common.scss
+// ブラウザ標準の上下スピンボタンを消す（number_field全般に適用）
+input[type="number"] {
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  -moz-appearance: textfield;
+}

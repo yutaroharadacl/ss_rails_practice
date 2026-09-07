@@ -1,5 +1,7 @@
 class CreateCartItems < ActiveRecord::Migration[6.0]
-  def change
+  def up
+    return if data_source_exists?(:cart_items)
+
     create_table :cart_items do |t|
       t.references :cart, null: false, foreign_key: true
       t.integer :product_id
@@ -8,5 +10,11 @@ class CreateCartItems < ActiveRecord::Migration[6.0]
 
       t.timestamps
     end
+  end
+
+  def down
+    return unless data_source_exists?(:cart_items)
+
+    drop_table :cart_items
   end
 end

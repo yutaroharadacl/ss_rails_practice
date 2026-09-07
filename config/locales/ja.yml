@@ -2,8 +2,8 @@ ja:
   number:
     currency:
       format:
-        format: "%u%n"
-        unit: "¥"
+        format: "%n%u"
+        unit: "円"
         precision: 0
         separator: "."
         delimiter: ","

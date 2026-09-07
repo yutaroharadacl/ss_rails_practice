@@ -1,0 +1,16 @@
+- if @total_pages > 1
+  %nav
+    %ul.pagination
+      %li{class: ('disabled' if @page <= 1)}
+        - if @page <= 1
+          %span 前へ
+        - else
+          = link_to '前へ', products_path(request.query_parameters.merge('page' => @page - 1))
+      %li.disabled
+        %span
+          = "#{@page} / #{@total_pages}（全#{@total_count}件）"
+      %li{class: ('disabled' if @page >= @total_pages)}
+        - if @page >= @total_pages
+          %span 次へ
+        - else
+          = link_to '次へ', products_path(request.query_parameters.merge('page' => @page + 1))

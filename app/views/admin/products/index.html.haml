@@ -1,13 +1,40 @@
 %h1
   = @store.name
-  の商品一覧
+  の商品管理
 
 %p= link_to '新規登録', new_admin_store_product_path(@store), class: 'btn btn-primary'
 
-- if @products.empty?
-  %p 商品がありません
+.panel.panel-default
+  .panel-heading 検索条件
+  .panel-body
+    %p.text-muted
+      ※いずれか1つ以上の条件を指定してください（「公開: 両方」のみでは検索しません）
+    = form_with url: admin_store_products_path(@store), method: :get, local: true do
+      .form-group
+        = label_tag :name, '商品名'
+        = text_field_tag :name, @q_name, class: 'form-control', placeholder: '部分一致'
+      .form-group
+        = label_tag :sku_code, 'SKUコード'
+        = text_field_tag :sku_code, @q_sku_code, class: 'form-control', placeholder: '部分一致'
+      .form-group
+        = label_tag :published, '公開'
+        = select_tag :published, options_for_select([['両方', 'all'], ['公開', 'true'], ['非公開', 'false']], @q_published), class: 'form-control'
+      .form-group
+        = label_tag :price_min, '価格 下限'
+        = number_field_tag :price_min, @q_price_min, class: 'form-control', min: 0, placeholder: '下限'
+      .form-group
+        = label_tag :price_max, '価格 上限'
+        = number_field_tag :price_max, @q_price_max, class: 'form-control', min: 0, placeholder: '上限'
+      .form-group
+        = submit_tag '検索', class: 'btn btn-primary'
+        = link_to 'クリア', admin_store_products_path(@store), class: 'btn btn-default'
+
+- if !@searched
+  .alert.alert-info 検索条件を指定して検索してください
+- elsif @products.empty?
+  .alert.alert-warning 該当する商品がありません
 - else
-  %table.table
+  %table.table.table-striped.table-bordered
     %thead
       %tr
         %th 商品名

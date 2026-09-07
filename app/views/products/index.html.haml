@@ -1,9 +1,37 @@
 %h1 商品一覧
 
-- if @products.empty?
-  %p 公開中の商品はありません
+.panel.panel-default
+  .panel-heading 検索条件
+  .panel-body
+    %p.text-muted
+      ※条件を指定して絞り込むか、未入力のまま検索すると公開商品を全件表示します
+    = form_with url: products_path, method: :get, local: true do
+      = hidden_field_tag :search, 1
+      .form-group
+        = label_tag :name, '商品名'
+        = text_field_tag :name, @q_name, class: 'form-control', placeholder: '部分一致'
+      .form-group
+        = label_tag :sku_code, 'SKUコード'
+        = text_field_tag :sku_code, @q_sku_code, class: 'form-control', placeholder: '部分一致'
+      .form-group
+        = label_tag :store_name, '店舗名'
+        = text_field_tag :store_name, @q_store_name, class: 'form-control', placeholder: '部分一致'
+      .form-group
+        = label_tag :price_min, '価格（円）'
+        = number_field_tag :price_min, @q_price_min, class: 'form-control', min: 0, placeholder: '下限'
+      .form-group
+        = label_tag :price_max, '〜'
+        = number_field_tag :price_max, @q_price_max, class: 'form-control', min: 0, placeholder: '上限'
+      .form-group
+        = submit_tag '検索', class: 'btn btn-primary'
+        = link_to 'クリア', products_path, class: 'btn btn-default'
+
+- if !@submitted
+  .alert.alert-info 検索条件を指定して検索してください（未入力でも全件表示できます）
+- elsif @products.empty?
+  .alert.alert-warning 該当する商品がありません
 - else
-  %table.table
+  %table.table.table-striped.table-bordered
     %thead
       %tr
         %th 商品名
@@ -21,3 +49,4 @@
               = product.sku.stock_quantity
             - else
               売り切れ
+  = render 'pagination'

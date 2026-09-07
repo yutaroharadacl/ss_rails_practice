@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_09_03_055350) do
+ActiveRecord::Schema.define(version: 2026_09_07_050713) do
 
   create_table "cart_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.bigint "cart_id", null: false
@@ -33,6 +33,7 @@ ActiveRecord::Schema.define(version: 2026_09_03_055350) do
     t.integer "quantity", default: 0, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "price", null: false
     t.index ["order_id", "product_id"], name: "index_order_items_on_order_id_and_product_id", unique: true
     t.index ["order_id"], name: "index_order_items_on_order_id"
   end
@@ -41,6 +42,11 @@ ActiveRecord::Schema.define(version: 2026_09_03_055350) do
     t.string "payment_status", default: "pending", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "order_number", null: false
+    t.string "status", default: "new", null: false
+    t.bigint "user_id"
+    t.index ["order_number"], name: "index_orders_on_order_number", unique: true
+    t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
   add_foreign_key "cart_items", "carts"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_09_07_050713) do
+ActiveRecord::Schema.define(version: 2026_09_07_062957) do
 
   create_table "cart_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.bigint "cart_id", null: false
@@ -45,6 +45,10 @@ ActiveRecord::Schema.define(version: 2026_09_07_050713) do
     t.string "order_number", null: false
     t.string "status", default: "new", null: false
     t.bigint "user_id"
+    t.string "shipping_postal_code"
+    t.string "shipping_prefecture"
+    t.string "shipping_city"
+    t.string "shipping_address_line"
     t.index ["order_number"], name: "index_orders_on_order_number", unique: true
     t.index ["user_id"], name: "index_orders_on_user_id"
   end

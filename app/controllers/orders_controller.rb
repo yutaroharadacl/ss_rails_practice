@@ -4,6 +4,7 @@ class OrdersController < ApplicationController
 
   def new
     @cart = existing_cart
+    @order = Order.new
   end
 
   def create
@@ -15,9 +16,10 @@ class OrdersController < ApplicationController
 
     order = nil
     ActiveRecord::Base.transaction do
-      order = Order.create!(payment_status: 'pending')
+      order = Order.create!(order_params.merge(payment_status: 'pending'))
       cart.cart_items.each do |item|
-        order.order_items.create!(product_id: item.product_id, quantity: item.quantity)
+        # TODO: productができたらpriceを入れる
+        order.order_items.create!(product_id: item.product_id, quantity: item.quantity, price: 1000)
       end
       order.update!(payment_status: 'paid')
       cart.destroy
@@ -29,5 +31,11 @@ class OrdersController < ApplicationController
 
   def show
     @order = Order.find(params[:id])
+  end
+
+  private
+
+  def order_params
+    params.require(:order).permit(:shipping_postal_code, :shipping_prefecture, :shipping_city, :shipping_address_line)
   end
 end

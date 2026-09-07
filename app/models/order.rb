@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Order < ApplicationRecord
+  before_create :generate_order_number
+
   has_many :order_items, dependent: :destroy
 
   # statusはnewかcompleteのみ。%wは文字列の配列を作成
@@ -26,5 +28,11 @@ class Order < ApplicationRecord
 
   def total
     subtotal + tax
+  end
+
+  # 10桁のランダムな英数字を作成
+  # TODO: 衝突した時の再実行処理が必要かどうか
+  def generate_order_number
+    self.order_number = SecureRandom.alphanumeric(10)
   end
 end

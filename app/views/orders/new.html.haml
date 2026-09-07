@@ -21,5 +21,23 @@
           %td.text-right{colspan: 2} 小計
           %td= number_to_currency(@cart.total_price)
 
-  .text-right
-    = button_to '注文を確定する', orders_path, method: :post, class: 'btn btn-primary'
+  %h2 お届け先住所
+  =form_with model: @order, url: orders_path, local: true do |f|
+    .form-group
+      .row
+        .col-xs-4
+          = f.label :shipping_postal_code, '郵便番号'
+          = f.text_field :shipping_postal_code, class: 'form-control'
+    .form-group
+      .row
+        .col-xs-6
+          = f.label :shipping_prefecture, '都道府県'
+          = f.text_field :shipping_prefecture, class: 'form-control'
+        .col-xs-6
+          = f.label :shipping_city, '市区町村'
+          = f.text_field :shipping_city, class: 'form-control'
+    .form-group
+      = f.label :shipping_address_line, '番地'
+      = f.text_field :shipping_address_line, class: 'form-control'
+    .text-right
+      = f.submit '注文を確定する', class: 'btn btn-primary'

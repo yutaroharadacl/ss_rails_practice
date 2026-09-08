@@ -1,8 +1,16 @@
 # frozen_string_literal: true
 
 class OrdersController < ApplicationController
+  rescue_from ActiveRecord::RecordNotFound do |_e|
+    redirect_to cart_path, alert: t('flash.orders.error.not_found')
+  end
+
   rescue_from ActiveRecord::RecordNotUnique do |_e|
     redirect_to cart_path, alert: t('flash.orders.error.duplicate_order_number')
+  end
+
+  rescue_from ActiveRecord::RecordInvalid do |e|
+    redirect_to cart_path, alert: e.record.errors.full_messages.join(', ')
   end
 
   def new
@@ -14,7 +22,7 @@ class OrdersController < ApplicationController
   def create
     cart = existing_cart
     if cart.nil? || cart.cart_items.empty?
-      redirect_to cart_path
+      redirect_to cart_path, alert: t('flash.orders.error.empty_cart')
       return
     end
 

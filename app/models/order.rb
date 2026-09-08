@@ -7,6 +7,7 @@ class Order < ApplicationRecord
 
   # statusはnewかcompleteのみ。%wは文字列の配列を作成
   validates :status, inclusion: { in: %w[new complete] }
+  validates :payment_status, inclusion: { in: %w[pending paid failed] }
   # accepts_nested_attributes_forに指定するとorderの変更にorder_itemsも含めてあげると自動的に更新してくれる
   accepts_nested_attributes_for :order_items, allow_destroy: true
 

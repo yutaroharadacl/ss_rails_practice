@@ -8,7 +8,6 @@
       %th 受注番号
       %th 顧客番号
       %th 名前
-      %th 受注種別
       %th 対応状況
       %th 支払い方法
       %th 決済状況
@@ -20,12 +19,11 @@
         %td= order.id
         -# strftimeで日時を好きなフォーマットに変えられる
         %td= order.created_at.strftime('%Y/%m/%d %H:%M:%S') 
+        %td= order.order_number
         %td
-        %td
-        %td= order.customer_name
-        %td
+        %td ダミー 
         %td= orders_status_label(order.status)
-        %td
-        %td
-        %td
+        %td クレジット支払い
+        %td= payment_status_label(order.payment_status)
+        %td= number_to_currency(order.total)
         %td= link_to "詳細", admin_order_path(order)

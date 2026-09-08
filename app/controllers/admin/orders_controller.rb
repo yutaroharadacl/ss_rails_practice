@@ -24,7 +24,7 @@ module Admin
 
     def order_params
       # _destroyは、Railsが「このネストしたレコードを削除対象とする」ために内部的に使う特別なキー名
-      params.require(:order).permit(:status, order_items_attributes: %i[id price quantity _destroy])
+      params.require(:order).permit(:status, :shipping_postal_code, :shipping_prefecture, :shipping_city, :shipping_address_line, order_items_attributes: %i[id price quantity _destroy])
     end
 
     def set_order

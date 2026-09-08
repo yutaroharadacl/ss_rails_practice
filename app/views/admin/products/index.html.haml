@@ -11,20 +11,20 @@
       ※いずれか1つ以上の条件を指定してください（「公開: 両方」のみでは検索しません）
     = form_with url: admin_store_products_path(@store), method: :get, local: true do
       .form-group
-        = label_tag :name, '商品名'
-        = text_field_tag :name, @q_name, class: 'form-control', placeholder: '部分一致'
+        = label_tag 'q[name_cont]', '商品名'
+        = text_field_tag 'q[name_cont]', @q.name_cont, class: 'form-control', placeholder: '部分一致'
       .form-group
-        = label_tag :sku_code, 'SKUコード'
-        = text_field_tag :sku_code, @q_sku_code, class: 'form-control', placeholder: '部分一致'
+        = label_tag 'q[sku_code_cont]', 'SKUコード'
+        = text_field_tag 'q[sku_code_cont]', @q.sku_code_cont, class: 'form-control', placeholder: '部分一致'
       .form-group
-        = label_tag :published, '公開'
-        = select_tag :published, options_for_select([['両方', 'all'], ['公開', 'true'], ['非公開', 'false']], @q_published), class: 'form-control'
+        = label_tag 'q[published_eq]', '公開'
+        = select_tag 'q[published_eq]', options_for_select([['両方', ''], ['公開', true], ['非公開', false]], @q.published_eq), class: 'form-control'
       .form-group
-        = label_tag :price_min, '価格 下限'
-        = number_field_tag :price_min, @q_price_min, class: 'form-control', min: 0, placeholder: '下限'
+        = label_tag 'q[sku_price_gteq]', '価格 下限'
+        = number_field_tag 'q[sku_price_gteq]', @q.sku_price_gteq, class: 'form-control', min: 0, placeholder: '下限'
       .form-group
-        = label_tag :price_max, '価格 上限'
-        = number_field_tag :price_max, @q_price_max, class: 'form-control', min: 0, placeholder: '上限'
+        = label_tag 'q[sku_price_lteq]', '価格 上限'
+        = number_field_tag 'q[sku_price_lteq]', @q.sku_price_lteq, class: 'form-control', min: 0, placeholder: '上限'
       .form-group
         = submit_tag '検索', class: 'btn btn-primary'
         = link_to 'クリア', admin_store_products_path(@store), class: 'btn btn-default'

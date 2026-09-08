@@ -13,4 +13,9 @@ class Sku < ApplicationRecord
   def in_stock?
     stock_quantity.positive?
   end
+
+    # sku.rb
+    def self.ransackable_attributes(_auth_object = nil)
+      %w[code price]
+    end
 end

@@ -5,3 +5,8 @@ ja:
         notice: "カートに追加しました"
       error:
         not_found: "対象のデータが見つかりませんでした。"
+    admin:
+      products:
+        error:
+          not_found: "指定された商品または店舗が見つかりませんでした。"
+

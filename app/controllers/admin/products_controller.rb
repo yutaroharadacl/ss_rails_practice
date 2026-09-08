@@ -4,37 +4,17 @@ module Admin
   class ProductsController < ApplicationController
     before_action :set_store
     before_action :set_product, only: %i[show edit update destroy]
+    rescue_from ActiveRecord::RecordNotFound do |_e|
+      redirect_to products_path, alert: t('flash.admin.products.error.not_found')
+    end
+  
 
     def index
-      @q_name = params[:name].to_s.strip
-      @q_sku_code = params[:sku_code].to_s.strip
-      @q_published = params[:published].presence || 'all'
-      @q_price_min = params[:price_min].to_s.strip
-      @q_price_max = params[:price_max].to_s.strip
-
-      @searched = @q_name.present? || @q_sku_code.present? ||  # ユーザー側のみ
-                  @q_price_min.present? ||
-                  @q_price_max.present? ||
-                  @q_published != 'all'
-
-      if @searched
-        products = @store.products.includes(:sku)
-        products = products.where('products.name LIKE ?', "%#{Product.sanitize_sql_like(@q_name)}%") if @q_name.present?
-        products = products.where(published: true) if @q_published == 'true'
-        products = products.where(published: false) if @q_published == 'false'
-        if @q_sku_code.present? || @q_price_min.present? || @q_price_max.present?
-          products = products.joins(:sku)
-          if @q_sku_code.present?
-            products = products.where('skus.code LIKE ?',
-                                      "%#{Sku.sanitize_sql_like(@q_sku_code)}%")
-          end
-          products = products.where('skus.price >= ?', @q_price_min.to_i) if @q_price_min.present?
-          products = products.where('skus.price <= ?', @q_price_max.to_i) if @q_price_max.present?
-        end
-        @products = products
-      else
-        @products = Product.none
-      end
+      q_params = search_params
+      @searched = q_params.values.any?(&:present?)
+    
+      @q = @store.products.includes(:sku).ransack(q_params)
+      @products = @searched ? @q.result(distinct: true) : Product.none
     end
     
     def show
@@ -86,6 +66,12 @@ module Admin
         :description,
         :published,
         sku_attributes: %i[id code price stock_quantity]
+      )
+    end
+    
+    def search_params
+      params.fetch(:q, {}).permit(
+        :name_cont, :sku_code_cont, :published_eq, :sku_price_gteq, :sku_price_lteq
       )
     end
   end

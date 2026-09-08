@@ -10,7 +10,9 @@ module Admin
       @orders = Order.all
     end
 
-    def show; end
+    def show
+      @breadcrumbs = [{ name: '受注管理', path: admin_orders_path }, { name: '受注詳細' }]
+    end
 
     def update
       if @order.update(order_params)

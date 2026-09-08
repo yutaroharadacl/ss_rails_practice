@@ -5,6 +5,7 @@ class OrdersController < ApplicationController
   def new
     @cart = existing_cart
     @order = Order.new
+    @breadcrumbs = [{ name: 'カート', path: cart_path }, { name: '注文確認' }]
   end
 
   def create

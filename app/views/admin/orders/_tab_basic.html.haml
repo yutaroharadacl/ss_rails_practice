@@ -1,0 +1,15 @@
+#tab-basic.tab-pane.active
+  =render layout: 'panel', locals: { title: '基本情報', action: (@order.editable? ? button_to('完了にする', admin_order_path(@order), method: :patch, params: { order: { status: 'complete' } }, class: 'btn btn-primary') : nil) } do
+    =render 'panel_row', label: 'ID', value: @order.id
+    =render 'panel_row', label: '受注番号', value: @order.order_number
+    =render 'panel_row', label: '対応状況', value: orders_status_label(@order.status)
+
+  -# TODO: ユーザーテーブルから引っ張る
+  =render layout: 'panel', locals: { title: '購入者情報' } do
+    =render 'panel_row', label: '顧客番号', value: 'ダミー'
+    =render 'panel_row', label: '名前', value: 'ダミー'
+    =render 'panel_row', label: '名前(カナ)', value: 'ダミー'
+    =render 'panel_row', label: '住所', value: 'ダミー'
+    =render 'panel_row', label: '電話番号', value: 'ダミー'
+    =render 'panel_row', label: 'FAX', value: 'ダミー'
+    =render 'panel_row', label: 'メールアドレス', value: 'ダミー'

@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Admin::Orders', type: :request do
-  let!(:order) { Order.create(customer_name: '山田太郎', customer_email: 'a@example.com', status: 'new') }
+  let!(:order) { Order.create(status: 'new') }
 
   describe 'GET /admin/orders' do
     it '一覧が正常に取得できる' do
@@ -12,7 +12,7 @@ RSpec.describe 'Admin::Orders', type: :request do
       expect(response.body).to include('ID')
       expect(response.body).to include('1')
       expect(response.body).to include('名前')
-      expect(response.body).to include('山田太郎')
+      expect(response.body).to include('ダミー')
       expect(response.body).to include('対応状況')
       expect(response.body).to include('新規')
     end
@@ -63,7 +63,7 @@ RSpec.describe 'Admin::Orders', type: :request do
     end
 
     context 'statusがcompleteの場合' do
-      let!(:order) { Order.create(customer_name: '山田太郎', customer_email: 'a@example.com', status: 'complete') }
+      let!(:order) { Order.create(status: 'complete') }
       it 'statusは変更されない' do
         patch admin_order_path(order), params: { order: { status: 'new' } }
         expect(order.reload.status).to eq('complete')

@@ -16,7 +16,7 @@ RSpec.describe Order, type: :model do
 
   describe '#subtotal' do
     it 'すべてのアイテムの小計が出力されること' do
-      order = Order.create!(customer_name: '山田太郎', customer_email: 'a@example.com', status: 'new')
+      order = Order.create!(status: 'new')
       order.order_items.create!(product_id: 1, quantity: 2, price: 500)
       order.order_items.create!(product_id: 2, quantity: 1, price: 300)
       expect(order.subtotal).to eq(1300)
@@ -25,7 +25,7 @@ RSpec.describe Order, type: :model do
 
   describe '#tax' do
     it '消費税の計算がされること' do
-      order = Order.create!(customer_name: '山田太郎', customer_email: 'a@example.com', status: 'new')
+      order = Order.create!(status: 'new')
       order.order_items.create!(product_id: 1, quantity: 2, price: 500)
       order.order_items.create!(product_id: 2, quantity: 1, price: 300)
       expect(order.tax).to eq(130)
@@ -34,7 +34,7 @@ RSpec.describe Order, type: :model do
 
   describe '#total' do
     it '小計と消費税の合計が出力されること' do
-      order = Order.create!(customer_name: '山田太郎', customer_email: 'a@example.com', status: 'new')
+      order = Order.create!(status: 'new')
       order.order_items.create!(product_id: 1, quantity: 2, price: 500)
       order.order_items.create!(product_id: 2, quantity: 1, price: 300)
       expect(order.total).to eq(1430)

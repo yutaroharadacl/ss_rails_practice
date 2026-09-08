@@ -1,0 +1,8 @@
+- if @breadcrumbs.present?
+  %ol.breadcrumb
+    - @breadcrumbs.each do |item|
+      %li
+        - if item[:path]
+          = link_to item[:name], item[:path]
+        - else
+          = item[:name]

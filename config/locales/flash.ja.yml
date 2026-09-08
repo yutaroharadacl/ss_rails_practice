@@ -5,3 +5,6 @@ ja:
         notice: "カートに追加しました"
       error:
         not_found: "対象のデータが見つかりませんでした。"
+    orders:
+      error:
+        duplicate_order_number: "注文番号の発行に失敗しました。もう一度お試しください。"

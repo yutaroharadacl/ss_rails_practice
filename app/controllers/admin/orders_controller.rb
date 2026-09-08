@@ -7,7 +7,7 @@ module Admin
     before_action :check_order_completed, only: [:update]
 
     def index
-      @orders = Order.all
+      @orders = Order.all.includes(:order_items)
     end
 
     def show

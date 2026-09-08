@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class OrdersController < ApplicationController
+  rescue_from ActiveRecord::RecordNotUnique do |_e|
+    redirect_to cart_path, alert: t('flash.orders.error.duplicate_order_number')
+  end
+
   def new
     @cart = existing_cart
     @order = Order.new
@@ -17,11 +21,11 @@ class OrdersController < ApplicationController
     order = create_order_from_cart(cart)
     session.delete(:cart_id)
 
-    redirect_to order_path(order)
+    redirect_to order_path(order.order_number)
   end
 
   def show
-    @order = Order.find(params[:id])
+    @order = Order.find_by!(order_number: params[:id])
   end
 
   private
@@ -29,15 +33,25 @@ class OrdersController < ApplicationController
   def create_order_from_cart(cart)
     order = nil
     ActiveRecord::Base.transaction do
-      order = Order.create!(order_params.merge(payment_status: 'pending'))
-      cart.cart_items.each do |item|
-        # TODO: productができたらpriceを入れる
-        order.order_items.create!(product_id: item.product_id, quantity: item.quantity, price: 1000)
-      end
-      order.update!(payment_status: 'paid')
+      order = build_order_with_items(cart)
+      confirm_payment!(order)
       cart.destroy
     end
     order
+  end
+
+  def build_order_with_items(cart)
+    order = Order.create!(order_params.merge(payment_status: 'pending'))
+    cart.cart_items.each do |item|
+      # TODO: productができたらpriceを入れる
+      order.order_items.create!(product_id: item.product_id, quantity: item.quantity, price: 1000)
+    end
+    order
+  end
+
+  # TODO: 決済APIと連携したら、実際の決済結果に応じてpaid/failedを設定する
+  def confirm_payment!(order)
+    order.update!(payment_status: 'paid')
   end
 
   def order_params

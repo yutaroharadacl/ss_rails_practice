@@ -44,7 +44,7 @@ RSpec.describe 'Orders', type: :request do
       expect(order.payment_status).to eq('paid')
       expect(order.order_items.first.quantity).to eq(2)
       expect(Cart.count).to eq(0)
-      expect(response).to redirect_to(order_path(order))
+      expect(response).to redirect_to(order_path(order.order_number))
     end
   end
 end

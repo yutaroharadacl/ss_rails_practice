@@ -2,6 +2,10 @@
 
 module Admin
   class OrdersController < ApplicationController
+    rescue_from ActiveRecord::RecordNotFound do |_e|
+      redirect_to admin_orders_path, alert: t('flash.admin.orders.error.not_found')
+    end
+
     # アクションを実行する前に実行する関数
     before_action :set_order, only: %i[show update]
     before_action :check_order_completed, only: [:update]
@@ -38,7 +42,7 @@ module Admin
     def check_order_completed
       return if @order.editable?
 
-      redirect_to admin_order_path(@order, anchor: params[:tab]), alert: '完了済みの受注は編集できません'
+      redirect_to admin_order_path(@order, anchor: params[:tab]), alert: t('flash.admin.orders.error.not_editable')
     end
   end
 end

@@ -29,8 +29,16 @@ RSpec.describe 'Orders', type: :request do
     it 'カートに商品があるとき、注文を保存して完了画面へ進む' do
       post cart_items_path, params: { cart_item: { product_id: 1, quantity: 2 } }
 
-      expect { post cart_orders_path }.to change(Order, :count).by(1)
-        .and change(OrderItem, :count).by(1)
+      order_attrs = {
+        shipping_postal_code: '1000001',
+        shipping_prefecture: '東京都',
+        shipping_city: '千代田区',
+        shipping_address_line: '1-1-1'
+      }
+
+      expect { post cart_orders_path, params: { order: order_attrs } }.to change(Order, :count).by(1)
+                                                                                               .and change(OrderItem,
+                                                                                                           :count).by(1)
 
       order = Order.last
       expect(order.payment_status).to eq('paid')

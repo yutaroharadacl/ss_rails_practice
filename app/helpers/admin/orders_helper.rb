@@ -7,11 +7,11 @@ module Admin
     end
 
     def payment_status_label(status)
-      case status
-      when 'pending' then '支払い待ち'
-      when 'paid' then '支払い済み'
-      when 'failed' then '決済失敗'
-      end
+      {
+        'pending' => '支払い待ち',
+        'paid' => '支払い済み',
+        'failed' => '決済失敗'
+      }[status]
     end
   end
 end

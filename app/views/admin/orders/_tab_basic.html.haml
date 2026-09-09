@@ -2,14 +2,8 @@
   =render layout: 'panel', locals: { title: '基本情報' } do
     =render 'panel_row', label: 'ID', value: @order.id
     =render 'panel_row', label: '受注番号', value: @order.order_number
-    - status_value = orders_status_label(@order.status)
-    - if @order.editable?
-      -# capture do end 出力せずにHTML文字列としてstatus_valueに格納してくれる
-      - status_value = capture do
-        = form_with model: [:admin, @order], method: :patch, local: true do |f|
-          = hidden_field_tag :tab, 'tab-basic'
-          = f.select :status, Order::STATUS_LABELS.map { |value, label| [label, value] }, {}, class: 'form-control input-sm', onchange: 'this.form.submit();'
-    =render 'panel_row', label: '対応状況', value: status_value
+    =render 'panel_row', label: '対応状況', value: orders_status_label(@order.status)
+    =render 'panel_row', label: 'お届け日', value: @order.desired_delivery_date&.strftime('%Y/%m/%d')
 
   -# TODO: ユーザーテーブルから引っ張る
   =render layout: 'panel', locals: { title: '購入者情報' } do

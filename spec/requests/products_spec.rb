@@ -6,8 +6,9 @@ RSpec.describe 'Products', type: :request do
   let!(:store) { Store.create!(name: 'テスト店舗', code: 'TEST') }
 
   def create_product!(name:, code:, published: true, price: 1000, stock_quantity: 10)
-    product = store.products.create!(name: name, description: '説明', published: published)
-    product.create_sku!(code: code, price: price, stock_quantity: stock_quantity)
+    product = store.products.build(name: name, description: '説明', published: published)
+    product.build_sku(code: code, price: price, stock_quantity: stock_quantity)
+    product.save!
     product
   end
 
@@ -38,7 +39,7 @@ RSpec.describe 'Products', type: :request do
       let!(:other_product) { create_product!(name: '公開みかん', code: 'SKU-PUB-2') }
 
       it '商品名の部分一致で絞り込める' do
-        get products_path, params: { search: 1, name: 'りんご' }
+        get products_path, params: { search: 1, q: { name_cont: 'りんご' } }
         expect(response).to have_http_status(:success)
         expect(response.body).to include('公開りんご')
         expect(response.body).not_to include('公開みかん')
@@ -54,7 +55,7 @@ RSpec.describe 'Products', type: :request do
       end
 
       it 'page=2 では2ページ目の商品が出て、1ページ目の商品は出ない' do
-        get products_path, params: { search: 1, name: '商品', page: 2 }
+        get products_path, params: { search: 1, q: { name_cont: '商品' }, page: 2 }
         expect(response).to have_http_status(:success)
         expect(response.body).to include('商品C')
         expect(response.body).not_to include('商品A')
@@ -62,7 +63,7 @@ RSpec.describe 'Products', type: :request do
       end
 
       it 'search と検索条件を残した page 付き GET が成功する' do
-        get products_path, params: { search: 1, name: '商品', page: 2 }
+        get products_path, params: { search: 1, q: { name_cont: '商品' }, page: 2 }
         expect(response).to have_http_status(:success)
         expect(response.body).to include('2 / 2')
         expect(response.body).to include('商品C')

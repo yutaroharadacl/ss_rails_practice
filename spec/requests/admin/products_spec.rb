@@ -7,8 +7,9 @@ RSpec.describe 'Admin::Products', type: :request do
   let!(:other_store) { Store.create!(name: '別店舗', code: 'OTHER') }
 
   def create_product!(store:, name:, code:, published: true, price: 1000, stock_quantity: 10)
-    product = store.products.create!(name: name, description: '説明', published: published)
-    product.create_sku!(code: code, price: price, stock_quantity: stock_quantity)
+    product = store.products.build(name: name, description: '説明', published: published)
+    product.build_sku(code: code, price: price, stock_quantity: stock_quantity)
+    product.save!
     product
   end
 

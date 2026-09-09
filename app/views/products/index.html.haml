@@ -8,20 +8,20 @@
     = form_with url: products_path, method: :get, local: true do
       = hidden_field_tag :search, 1
       .form-group
-        = label_tag :name, '商品名'
-        = text_field_tag :name, @q_name, class: 'form-control', placeholder: '部分一致'
+        = label_tag 'q[name_cont]', '商品名'
+        = text_field_tag 'q[name_cont]', @q.name_cont, class: 'form-control', placeholder: '部分一致'
       .form-group
-        = label_tag :sku_code, 'SKUコード'
-        = text_field_tag :sku_code, @q_sku_code, class: 'form-control', placeholder: '部分一致'
+        = label_tag 'q[sku_code_cont]', 'SKUコード'
+        = text_field_tag 'q[sku_code_cont]', @q.sku_code_cont, class: 'form-control', placeholder: '部分一致'
       .form-group
-        = label_tag :store_name, '店舗名'
-        = text_field_tag :store_name, @q_store_name, class: 'form-control', placeholder: '部分一致'
+        = label_tag 'q[store_name_cont]', '店舗名'
+        = text_field_tag 'q[store_name_cont]', @q.store_name_cont, class: 'form-control', placeholder: '部分一致'
       .form-group
-        = label_tag :price_min, '価格（円）'
-        = number_field_tag :price_min, @q_price_min, class: 'form-control', min: 0, placeholder: '下限'
-      .form-group
-        = label_tag :price_max, '〜'
-        = number_field_tag :price_max, @q_price_max, class: 'form-control', min: 0, placeholder: '上限'
+        %label 価格
+        .form-inline
+          = number_field_tag 'q[sku_price_gteq]', @q.sku_price_gteq, class: 'form-control', min: 0, placeholder: '下限'
+          %span{style: 'margin: 0 8px;'} ~
+          = number_field_tag 'q[sku_price_lteq]', @q.sku_price_lteq, class: 'form-control', min: 0, placeholder: '上限'
       .form-group
         = submit_tag '検索', class: 'btn btn-primary'
         = link_to 'クリア', products_path, class: 'btn btn-default'

@@ -5,7 +5,10 @@ Rails.application.routes.draw do
     resources :orders, only: %i[index show update]
   end
   root to: 'products#index'
-  resource :cart, only: [:show]
+  resources :orders, only: %i[show]
+  resource :cart, only: %i[show] do
+    resources :orders, only: %i[new create]
+  end
   # %iは中身中身をシンボルの配列にしてくれる[:create, :update, :destroy]のようになる
   resources :cart_items, only: %i[create update destroy]
   # ユーザー側：公開商品の一覧

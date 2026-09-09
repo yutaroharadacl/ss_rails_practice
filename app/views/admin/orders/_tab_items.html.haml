@@ -1,0 +1,42 @@
+#tab-items.tab-pane
+  =render layout: 'panel', locals: { title: '受注商品管理' } do
+    =form_with model: [:admin, @order], method: :patch, local: true do |f|
+      = hidden_field_tag :tab, 'tab-items'
+      %fieldset{disabled: !@order.editable?}
+        %table.table.table-middle
+          %thead
+            %tr
+              %th 商品コード
+              %th 商品名
+              %th SKUコード
+              %th 単価
+              %th 個数
+              %th 削除
+              %th 小計
+          %tbody
+            -# TODO: productテーブルとの紐付けが完了したら適宜入れていく。一旦ダミー
+            = f.fields_for :order_items do |item_form|
+              %tr
+                = item_form.hidden_field :id
+                %td ダミー
+                %td ダミー
+                %td ダミー
+                %td
+                  = item_form.number_field :price
+                  円
+                %td
+                  = item_form.number_field :quantity
+                  個
+                %td= item_form.check_box :_destroy
+                %td= number_to_currency(item_form.object.subtotal)
+            %tr
+              %td.text-right{colspan: 6} 小計
+              %td= number_to_currency(@order.subtotal)
+            %tr
+              %td.text-right{colspan:6} 消費税
+              %td= number_to_currency(@order.tax)
+            %tr.total-row
+              %td.text-right{colspan:6} 合計
+              %td.text-color-red= number_to_currency(@order.total)
+        .text-right
+          = f.submit '保存する', class: 'btn btn-primary'

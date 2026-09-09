@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
-  def current_major_menu_item
-    SidebarMenu::MENU_ITEMS.find do |item|
+  def current_major_menu_item(menu_items = SidebarMenu.menu_items)
+    menu_items.find do |item|
       item[:children].present? && item[:children].any? { |child| path_matches?(child[:path]) }
     end
   end

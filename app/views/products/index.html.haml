@@ -1,0 +1,56 @@
+%h1 商品一覧
+
+.panel.panel-default
+  .panel-heading 検索条件
+  .panel-body
+    %p.text-muted
+      ※条件を指定して絞り込むか、未入力のまま検索すると公開商品を全件表示します
+    = form_with url: products_path, method: :get, local: true do
+      = hidden_field_tag :search, 1
+      .form-group
+        = label_tag 'q[name_cont]', '商品名'
+        = text_field_tag 'q[name_cont]', @q.name_cont, class: 'form-control', placeholder: '部分一致'
+      .form-group
+        = label_tag 'q[sku_code_cont]', 'SKUコード'
+        = text_field_tag 'q[sku_code_cont]', @q.sku_code_cont, class: 'form-control', placeholder: '部分一致'
+      .form-group
+        = label_tag 'q[store_name_cont]', '店舗名'
+        = text_field_tag 'q[store_name_cont]', @q.store_name_cont, class: 'form-control', placeholder: '部分一致'
+      .form-group
+        %label 価格
+        .form-inline
+          = number_field_tag 'q[sku_price_gteq]', @q.sku_price_gteq, class: 'form-control', min: 0, placeholder: '下限'
+          %span{style: 'margin: 0 8px;'} ~
+          = number_field_tag 'q[sku_price_lteq]', @q.sku_price_lteq, class: 'form-control', min: 0, placeholder: '上限'
+      .form-group
+        = submit_tag '検索', class: 'btn btn-primary'
+        = link_to 'クリア', products_path, class: 'btn btn-default'
+
+- if !@submitted
+  .alert.alert-info 検索条件を指定して検索してください（未入力でも全件表示できます）
+- elsif @products.empty?
+  .alert.alert-warning 該当する商品がありません
+- else
+  %table.table.table-striped.table-bordered
+    %thead
+      %tr
+        %th 商品名
+        %th 店舗
+        %th 価格
+        %th 在庫
+    %tbody
+      - @products.each do |product|
+        %tr
+          %td= product.name
+          %td= product.store.name
+          %td= number_to_currency(product.sku&.price)
+          %td
+            - if product.sku&.in_stock?
+              = product.sku.stock_quantity
+              = form_with url: cart_items_path, method: :post, local: true do
+                = hidden_field_tag 'cart_item[product_id]', product.id
+                = hidden_field_tag 'cart_item[quantity]', 1
+                = submit_tag 'カートに入れる', class: 'btn btn-primary btn-sm'
+            - else
+              %span.text-muted 売り切れ
+  = render 'pagination'

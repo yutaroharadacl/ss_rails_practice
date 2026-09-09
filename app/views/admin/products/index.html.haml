@@ -1,0 +1,54 @@
+%h1
+  = @store.name
+  の商品管理
+
+%p= link_to '新規登録', new_admin_store_product_path(@store), class: 'btn btn-primary'
+
+.panel.panel-default
+  .panel-heading 検索条件
+  .panel-body
+    %p.text-muted
+      ※いずれか1つ以上の条件を指定してください（「公開: 両方」のみでは検索しません）
+    = form_with url: admin_store_products_path(@store), method: :get, local: true do
+      .form-group
+        = label_tag 'q[name_cont]', '商品名'
+        = text_field_tag 'q[name_cont]', @q.name_cont, class: 'form-control', placeholder: '部分一致'
+      .form-group
+        = label_tag 'q[sku_code_cont]', 'SKUコード'
+        = text_field_tag 'q[sku_code_cont]', @q.sku_code_cont, class: 'form-control', placeholder: '部分一致'
+      .form-group
+        = label_tag 'q[published_eq]', '公開'
+        = select_tag 'q[published_eq]', options_for_select([['両方', ''], ['公開', true], ['非公開', false]], @q.published_eq), class: 'form-control'
+      .form-group
+        %label 価格
+        .form-inline
+          = number_field_tag 'q[sku_price_gteq]', @q.sku_price_gteq, class: 'form-control', min: 0, placeholder: '下限'
+          %span{style: 'margin: 0 8px;'} ~
+          = number_field_tag 'q[sku_price_lteq]', @q.sku_price_lteq, class: 'form-control', min: 0, placeholder: '上限'
+      .form-group
+        = submit_tag '検索', class: 'btn btn-primary'
+        = link_to 'クリア', admin_store_products_path(@store), class: 'btn btn-default'
+
+- if !@searched
+  .alert.alert-info 検索条件を指定して検索してください
+- elsif @products.empty?
+  .alert.alert-warning 該当する商品がありません
+- else
+  %table.table.table-striped.table-bordered
+    %thead
+      %tr
+        %th 商品名
+        %th 公開
+        %th 価格
+        %th 在庫
+        %th 操作
+    %tbody
+      - @products.each do |product|
+        %tr
+          %td= link_to product.name, admin_store_product_path(@store, product)
+          %td= product.published? ? '公開' : '非公開'
+          %td= number_to_currency(product.sku&.price)
+          %td= product.sku&.stock_quantity
+          %td
+            = link_to '編集', edit_admin_store_product_path(@store, product), class: 'btn btn-default btn-sm'
+            = button_to '削除', admin_store_product_path(@store, product), method: :delete, class: 'btn btn-danger btn-sm', data: { confirm: '削除しますか？' }

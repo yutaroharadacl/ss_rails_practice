@@ -1,0 +1,19 @@
+%h1= @product.name
+
+%dl
+  %dt 店舗
+  %dd= @store.name
+  %dt 説明
+  %dd= @product.description
+  %dt 公開
+  %dd= @product.published? ? '公開' : '非公開'
+  %dt SKUコード
+  %dd= @product.sku&.code
+  %dt 価格
+  %dd= number_to_currency(@product.sku&.price)
+  %dt 在庫
+  %dd= @product.sku&.stock_quantity
+
+%p
+  = link_to '編集', edit_admin_store_product_path(@store, @product), class: 'btn btn-default'
+  = link_to '一覧へ', admin_store_products_path(@store), class: 'btn btn-default'

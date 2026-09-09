@@ -69,3 +69,5 @@ end
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'brakeman', require: false
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
+
+gem 'ransack', '~> 3.1'

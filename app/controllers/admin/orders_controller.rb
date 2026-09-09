@@ -6,12 +6,22 @@ module Admin
       redirect_to admin_orders_path, alert: t('flash.admin.orders.error.not_found')
     end
 
+    # id_eqなどに桁あふれする値を渡された場合の型キャストエラー対策
+    rescue_from ActiveModel::RangeError do |_e|
+      redirect_to admin_orders_path, alert: t('flash.admin.orders.error.invalid_search')
+    end
+
     # アクションを実行する前に実行する関数
     before_action :set_order, only: %i[show update]
     before_action :check_order_completed, only: [:update]
 
     def index
-      @orders = Order.all.includes(:order_items)
+      # ハッシュを渡して検索オブジェクトを作成する
+      # @q.result で検索オブジェクトから結果を取得できる
+      @q = Order.ransack(params[:q])
+      @searched = params[:q].present?
+      # distinct: true は、検索条件によっては内部でJOINが発生して同じ受注が複数行返ってくることがあるので、それを防ぐため
+      @orders = @q.result(distinct: true).includes(:order_items)
     end
 
     def show

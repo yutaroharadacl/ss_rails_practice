@@ -1,6 +1,19 @@
 # frozen_string_literal: true
 
 class Order < ApplicationRecord
+  # statusの値と日本語ラベルの対応（一覧表示・検索フォームの両方から参照する）
+  STATUS_LABELS = { 'new' => '新規', 'complete' => '完了' }.freeze
+
+  # 検索可能な属性を許可する
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[id order_number status]
+  end
+
+  # 関連テーブルの検索を許可しない
+  def self.ransackable_associations(_auth_object = nil)
+    []
+  end
+
   before_create :generate_order_number
 
   has_many :order_items, dependent: :destroy

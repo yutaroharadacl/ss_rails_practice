@@ -16,6 +16,39 @@ RSpec.describe 'Admin::Orders', type: :request do
       expect(response.body).to include('対応状況')
       expect(response.body).to include('新規')
     end
+
+    context '検索条件を指定した場合' do
+      let!(:completed_order) { Order.create(status: 'complete') }
+
+      it 'IDで絞り込める' do
+        get admin_orders_path, params: { q: { id_eq: order.id } }
+        expect(response.body).to include(order.order_number)
+        expect(response.body).not_to include(completed_order.order_number)
+      end
+
+      it '受注番号の部分一致で絞り込める' do
+        get admin_orders_path, params: { q: { order_number_cont: order.order_number[0, 5] } }
+        expect(response.body).to include(order.order_number)
+        expect(response.body).not_to include(completed_order.order_number)
+      end
+
+      it '対応状況で絞り込める' do
+        get admin_orders_path, params: { q: { status_eq: 'complete' } }
+        expect(response.body).to include(completed_order.order_number)
+        expect(response.body).not_to include(order.order_number)
+      end
+
+      it '該当する受注がない場合はその旨が表示される' do
+        get admin_orders_path, params: { q: { id_eq: 0 } }
+        expect(response.body).to include('該当する受注が見つかりませんでした。')
+      end
+
+      it '検索条件が空の場合は全件表示される' do
+        get admin_orders_path, params: { q: { id_eq: '', order_number_cont: '', status_eq: '' } }
+        expect(response.body).to include(order.order_number)
+        expect(response.body).to include(completed_order.order_number)
+      end
+    end
   end
 
   describe 'GET /admin/orders/:id' do

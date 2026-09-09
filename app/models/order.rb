@@ -2,7 +2,8 @@
 
 class Order < ApplicationRecord
   # statusの値と日本語ラベルの対応（一覧表示・検索フォームの両方から参照する）
-  STATUS_LABELS = { 'new' => '新規', 'complete' => '完了' }.freeze
+  STATUS_LABELS = { 'new' => '新規', 'preparing' => '出荷準備中', 'shipped' => '発送済み', 'in_delivery' => '配達中',
+                    'complete' => '完了' }.freeze
 
   # 検索可能な属性を許可する
   def self.ransackable_attributes(_auth_object = nil)
@@ -19,13 +20,13 @@ class Order < ApplicationRecord
   has_many :order_items, dependent: :destroy
 
   # statusはnewかcompleteのみ。%wは文字列の配列を作成
-  validates :status, inclusion: { in: %w[new complete] }
+  validates :status, inclusion: { in: %w[new preparing shipped in_delivery complete] }
   validates :payment_status, inclusion: { in: %w[pending paid failed] }
   # accepts_nested_attributes_forに指定するとorderの変更にorder_itemsも含めてあげると自動的に更新してくれる
   accepts_nested_attributes_for :order_items, allow_destroy: true
 
   def editable?
-    status == 'new'
+    status != 'complete'
   end
 
   def subtotal

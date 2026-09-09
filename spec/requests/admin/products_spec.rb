@@ -6,13 +6,6 @@ RSpec.describe 'Admin::Products', type: :request do
   let!(:store) { Store.create!(name: '管理店舗', code: 'ADMIN') }
   let!(:other_store) { Store.create!(name: '別店舗', code: 'OTHER') }
 
-  def create_product!(store:, name:, code:, published: true, price: 1000, stock_quantity: 10)
-    product = store.products.build(name: name, description: '説明', published: published)
-    product.build_sku(code: code, price: price, stock_quantity: stock_quantity)
-    product.save!
-    product
-  end
-
   let!(:product) { create_product!(store: store, name: '管理りんご', code: 'ADM-APPLE') }
   let!(:unpublished_product) do
     create_product!(store: store, name: '管理バナナ', published: false, code: 'ADM-BANANA')

@@ -3,7 +3,8 @@
 class Sku < ApplicationRecord
   belongs_to :product
 
-  validates :code, presence: true, uniqueness: true
+  # Rails 6.1でuniquenessのデフォルト比較が変わるため、DEPRECATION WARNING回避のため明示している
+  validates :code, presence: true, uniqueness: { case_sensitive: true }
   validates :price,
             presence: true,
             numericality: { only_integer: true, greater_than_or_equal_to: 0 }

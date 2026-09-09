@@ -2,12 +2,14 @@ ja:
   activerecord:
     attributes:
       cart_item:
+        product: 商品
         product_id: 商品ID
         quantity: 数量
       order:
         status: 対応状況
         payment_status: 決済状況
       order_item:
+        product: 商品
         product_id: 商品ID
         price: 単価
         quantity: 個数
@@ -18,6 +20,7 @@ ja:
         name: 商品名
         description: 説明
         published: 公開
+        sku: SKU
       sku:
         code: SKUコード
         price: 価格

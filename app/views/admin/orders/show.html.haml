@@ -6,9 +6,12 @@
   %li{role: 'presentation'}
     %a{href: '#tab-address', data: { toggle: 'tab' }} お届け先住所
   %li{role: 'presentation'}
+    %a{href: '#tab-shipping', data: { toggle: 'tab' }} 配送情報
+  %li{role: 'presentation'}
     %a{href: '#tab-items', data: { toggle: 'tab' }} 受注商品管理
 
 .tab-content
   = render 'tab_basic'
   = render 'tab_address'
+  = render 'tab_shipping'
   = render 'tab_items'

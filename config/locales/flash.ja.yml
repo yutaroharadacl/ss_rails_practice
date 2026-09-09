@@ -22,6 +22,8 @@ ja:
         error:
           not_found: "指定された商品または店舗が見つかりませんでした。"
       orders:
+        update:
+          notice: "受注情報を更新しました。"
         error:
           not_editable: "完了済みの受注は編集できません"
           not_found: "対象の注文が見つかりませんでした。"

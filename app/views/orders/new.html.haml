@@ -13,10 +13,9 @@
     %tbody
       - @cart.cart_items.each do |item|
         %tr
-          %td ダミーアイテム
+          %td= item.product&.name || '削除された商品'
           %td= item.quantity
-          -# productテーブルが完成次第変える
-          %td 単価
+          %td= number_to_currency(item.unit_price)
       %tr
         %td.text-right{colspan: 2} 合計
         %td= number_to_currency(@cart.total_price)

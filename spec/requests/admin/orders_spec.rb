@@ -4,6 +4,13 @@ require 'rails_helper'
 
 RSpec.describe 'Admin::Orders', type: :request do
   let!(:order) { Order.create(status: 'new') }
+  let!(:product) do
+    store = Store.create!(name: '店舗', code: 'STORE')
+    product = store.products.build(name: 'りんご', description: '説明', published: true)
+    product.build_sku(code: 'APPLE', price: 1000, stock_quantity: 10)
+    product.save!
+    product
+  end
 
   describe 'GET /admin/orders' do
     it '一覧が正常に取得できる' do
@@ -52,7 +59,7 @@ RSpec.describe 'Admin::Orders', type: :request do
   end
 
   describe 'GET /admin/orders/:id' do
-    let!(:order_item) { order.order_items.create!(product_id: 1, quantity: 2, price: 1000) }
+    let!(:order_item) { order.order_items.create!(product_id: product.id, quantity: 2, price: 1000) }
     it '詳細が正常に取得できる' do
       get admin_order_path(order)
       expect(response).to have_http_status(:success)
@@ -71,7 +78,7 @@ RSpec.describe 'Admin::Orders', type: :request do
   end
 
   describe 'PATCH /admin/orders/:id' do
-    let!(:order_item) { order.order_items.create!(product_id: 1, quantity: 2, price: 1000) }
+    let!(:order_item) { order.order_items.create!(product_id: product.id, quantity: 2, price: 1000) }
     context 'statusがnewの場合' do
       it 'statusがcompleteに更新される' do
         patch admin_order_path(order), params: { order: { status: 'complete' } }

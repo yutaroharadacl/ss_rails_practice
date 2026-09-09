@@ -14,8 +14,8 @@ RSpec.describe 'layouts/_sidebar', type: :view do
           ]
         }
       ].freeze
-      stub_const('SidebarMenu::MENU_ITEMS', menu_items)
-      allow(view).to receive(:current_major_menu_item).and_return(menu_items.first)
+      allow(SidebarMenu).to receive(:menu_items).and_return(menu_items)
+      allow(view).to receive(:current_major_menu_item).with(menu_items).and_return(menu_items.first)
       render
     end
 
@@ -35,8 +35,8 @@ RSpec.describe 'layouts/_sidebar', type: :view do
           ]
         }
       ].freeze
-      stub_const('SidebarMenu::MENU_ITEMS', menu_items)
-      allow(view).to receive(:current_major_menu_item).and_return(menu_items.first)
+      allow(SidebarMenu).to receive(:menu_items).and_return(menu_items)
+      allow(view).to receive(:current_major_menu_item).with(menu_items).and_return(menu_items.first)
       render
     end
 

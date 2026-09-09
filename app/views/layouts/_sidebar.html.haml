@@ -1,6 +1,7 @@
 %ul.nav.nav-pills.nav-stacked
-  - current_major = current_major_menu_item
-  - SidebarMenu::MENU_ITEMS.each do |major|
+  - menu_items = SidebarMenu.menu_items
+  - current_major = current_major_menu_item(menu_items)
+  - menu_items.each do |major|
     - next if major[:children].blank?
     %li{class: ('active' if major.equal?(current_major))}
       = link_to major[:name], major[:children].first[:path]

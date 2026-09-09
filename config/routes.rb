@@ -26,9 +26,9 @@ Rails.application.routes.draw do
   end
 
   # 店舗側：商品 CRUD
- namespace :admin do
-  resources :stores, only: [] do
-    resources :products
-   end
- end
+  namespace :admin do
+    resources :stores, only: [] do
+      resources :products
+    end
+  end
 end

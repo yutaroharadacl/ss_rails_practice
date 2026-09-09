@@ -6,7 +6,7 @@ RSpec.describe 'Admin::Products', type: :request do
   let!(:store) { Store.create!(name: '管理店舗', code: 'ADMIN') }
   let!(:other_store) { Store.create!(name: '別店舗', code: 'OTHER') }
 
-  def create_product!(store:, name:, published: true, code:, price: 1000, stock_quantity: 10)
+  def create_product!(store:, name:, code:, published: true, price: 1000, stock_quantity: 10)
     product = store.products.create!(name: name, description: '説明', published: published)
     product.create_sku!(code: code, price: price, stock_quantity: stock_quantity)
     product
@@ -33,7 +33,7 @@ RSpec.describe 'Admin::Products', type: :request do
 
     context 'name 条件がある場合' do
       it '該当する店舗の商品が表示される' do
-        get admin_store_products_path(store), params: { name: 'りんご' }
+        get admin_store_products_path(store), params: { q: { name_cont: 'りんご' } }
         expect(response).to have_http_status(:success)
         expect(response.body).to include('管理りんご')
         expect(response.body).not_to include('管理バナナ')
@@ -43,14 +43,14 @@ RSpec.describe 'Admin::Products', type: :request do
 
     context 'published フィルタ' do
       it 'published=true で公開商品のみ表示される' do
-        get admin_store_products_path(store), params: { published: 'true' }
+        get admin_store_products_path(store), params: { q: { published_eq: true } }
         expect(response).to have_http_status(:success)
         expect(response.body).to include('管理りんご')
         expect(response.body).not_to include('管理バナナ')
       end
 
       it 'published=false で非公開商品のみ表示される' do
-        get admin_store_products_path(store), params: { published: 'false' }
+        get admin_store_products_path(store), params: { q: { published_eq: false } }
         expect(response).to have_http_status(:success)
         expect(response.body).to include('管理バナナ')
         expect(response.body).not_to include('管理りんご')

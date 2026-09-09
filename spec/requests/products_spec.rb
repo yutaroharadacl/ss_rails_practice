@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Products', type: :request do
   let!(:store) { Store.create!(name: 'テスト店舗', code: 'TEST') }
 
-  def create_product!(name:, published: true, code:, price: 1000, stock_quantity: 10)
+  def create_product!(name:, code:, published: true, price: 1000, stock_quantity: 10)
     product = store.products.create!(name: name, description: '説明', published: published)
     product.create_sku!(code: code, price: price, stock_quantity: stock_quantity)
     product

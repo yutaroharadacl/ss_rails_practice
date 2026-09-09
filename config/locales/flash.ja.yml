@@ -7,16 +7,21 @@ ja:
         not_found: "対象のデータが見つかりませんでした。"
     admin:
       products:
+        create:
+          notice: "商品を登録しました。"
+        update:
+          notice: "商品を更新しました。"
+        destroy:
+          notice: "商品を削除しました。"
+          error: "商品の削除に失敗しました。"
         error:
           not_found: "指定された商品または店舗が見つかりませんでした。"
-
+      orders:
+        error:
+          not_editable: "完了済みの受注は編集できません"
+          not_found: "対象の注文が見つかりませんでした。"
     orders:
       error:
         duplicate_order_number: "注文番号の発行に失敗しました。もう一度お試しください。"
         not_found: "対象の注文が見つかりませんでした。"
         empty_cart: "カートに商品がありません。"
-    admin:
-      orders:
-        error:
-          not_editable: "完了済みの受注は編集できません"
-          not_found: "対象の注文が見つかりませんでした。"

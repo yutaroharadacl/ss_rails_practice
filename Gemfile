@@ -70,4 +70,4 @@ end
 gem 'brakeman', require: false
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 
-gem "ransack", "~> 3.1"
+gem 'ransack', '~> 3.1'

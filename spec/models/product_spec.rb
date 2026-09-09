@@ -8,6 +8,7 @@ RSpec.describe Product, type: :model do
   describe 'バリデーション' do
     it '正常なデータの場合は有効' do
       product = store.products.build(name: 'テスト商品', published: true)
+      product.build_sku(code: 'TEST-001', price: 1000, stock_quantity: 10)
       expect(product).to be_valid
     end
 

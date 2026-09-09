@@ -2,6 +2,7 @@ ja:
   activerecord:
     attributes:
       cart_item:
+        product: 商品
         product_id: 商品ID
         quantity: 数量
       order:
@@ -19,6 +20,7 @@ ja:
         name: 商品名
         description: 説明
         published: 公開
+        sku: SKU
       sku:
         code: SKUコード
         price: 価格

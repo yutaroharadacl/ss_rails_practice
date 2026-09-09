@@ -3,6 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe 'Orders', type: :request do
+  let!(:store) { Store.create!(name: '店舗', code: 'ORDERS-REQ-STORE') }
+  let!(:product) { create_product!(store: store, name: 'りんご', code: 'ORDERS-REQ-APPLE') }
+
   describe 'GET /orders/new' do
     it 'カートが空のときは空のメッセージを表示する' do
       get new_cart_order_path
@@ -11,7 +14,7 @@ RSpec.describe 'Orders', type: :request do
     end
 
     it '明細があるとき、確認画面を表示する' do
-      post cart_items_path, params: { cart_item: { product_id: 1, quantity: 2 } }
+      post cart_items_path, params: { cart_item: { product_id: product.id, quantity: 2 } }
 
       get new_cart_order_path
       expect(response).to have_http_status(:success)
@@ -27,7 +30,7 @@ RSpec.describe 'Orders', type: :request do
     end
 
     it 'カートに商品があるとき、注文を保存して完了画面へ進む' do
-      post cart_items_path, params: { cart_item: { product_id: 1, quantity: 2 } }
+      post cart_items_path, params: { cart_item: { product_id: product.id, quantity: 2 } }
 
       order_attrs = {
         shipping_postal_code: '1000001',

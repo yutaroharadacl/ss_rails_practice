@@ -4,8 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Order, type: :model do
   let!(:store) { Store.create!(name: '店舗', code: 'STORE') }
-  let!(:product1) { create_product!(store: store, name: 'りんご', code: 'APPLE', price: 500) }
-  let!(:product2) { create_product!(store: store, name: 'みかん', code: 'ORANGE', price: 300) }
+  let!(:product1) { create_product!(store: store, name: 'りんご', code: 'APPLE', sku_attributes: { price: 500 }) }
+  let!(:product2) { create_product!(store: store, name: 'みかん', code: 'ORANGE', sku_attributes: { price: 300 }) }
 
   describe 'statusのバリデーション' do
     it 'new もしくは complete であれば有効' do

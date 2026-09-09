@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Admin::Orders', type: :request do
   let!(:order) { Order.create(status: 'new') }
   let!(:store) { Store.create!(name: '店舗', code: 'STORE') }
-  let!(:product) { create_product!(store: store, name: 'りんご', code: 'APPLE', price: 1000) }
+  let!(:product) { create_product!(store: store, name: 'りんご', code: 'APPLE', sku_attributes: { price: 1000 }) }
 
   describe 'GET /admin/orders' do
     it '一覧が正常に取得できる' do

@@ -24,13 +24,13 @@ class SidebarMenu
       name: '管理',
       children: [
         {
-          name: '受注管理',
-          path: '/admin/orders'
-        },
-        {
          name: '商品管理',
          path: '/admin/stores/1/products'
-    }
+        },
+        {
+         name: '受注管理',
+          path: '/admin/orders'
+       }
       ]
     }
   ].freeze

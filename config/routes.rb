@@ -4,13 +4,15 @@ Rails.application.routes.draw do
   namespace :admin do
     resources :orders, only: %i[index show update]
   end
-  root to: 'home#index'
+  root to: 'products#index'
   resources :orders, only: %i[show]
   resource :cart, only: %i[show] do
     resources :orders, only: %i[new create]
   end
   # %iは中身中身をシンボルの配列にしてくれる[:create, :update, :destroy]のようになる
   resources :cart_items, only: %i[create update destroy]
+  # ユーザー側：公開商品の一覧
+  resources :products, only: [:index]
 
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   namespace :api do
@@ -20,6 +22,13 @@ Rails.application.routes.draw do
 
     namespace :v2 do
       get 'health', to: 'health#index'
+    end
+  end
+
+  # 店舗側：商品 CRUD
+  namespace :admin do
+    resources :stores, only: [] do
+      resources :products
     end
   end
 end

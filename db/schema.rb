@@ -53,6 +53,38 @@ ActiveRecord::Schema.define(version: 2026_09_08_051123) do
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
+  create_table "products", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.bigint "store_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.boolean "published", default: false, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["store_id", "published"], name: "index_products_on_store_id_and_published"
+    t.index ["store_id"], name: "index_products_on_store_id"
+  end
+
+  create_table "skus", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.bigint "product_id", null: false
+    t.string "code", null: false
+    t.integer "price", null: false
+    t.integer "stock_quantity", default: 0, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["code"], name: "index_skus_on_code", unique: true
+    t.index ["product_id"], name: "index_skus_on_product_id", unique: true
+  end
+
+  create_table "stores", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "code", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["code"], name: "index_stores_on_code", unique: true
+  end
+
   add_foreign_key "cart_items", "carts"
   add_foreign_key "order_items", "orders"
+  add_foreign_key "products", "stores"
+  add_foreign_key "skus", "products"
 end

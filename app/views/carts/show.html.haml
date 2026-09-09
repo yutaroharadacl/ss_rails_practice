@@ -12,10 +12,12 @@
     %tbody
       - @cart.cart_items.each do |item|
         %tr
-          %td ダミーアイテム
-          = render 'cart_items/quantity_form', item: item
-          -# productテーブルができたらそこから取り出す
-          %td 価格
+          %td= item.product&.name || '削除された商品'
+          - if item.product
+            = render 'cart_items/quantity_form', item: item
+          - else
+            %td= item.quantity
+          %td= number_to_currency(item.quantity * item.unit_price)
           %td
             = button_to '削除', cart_item_path(item), method: :delete, class: 'btn btn-danger'
   .cart-summary

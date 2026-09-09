@@ -3,7 +3,7 @@
 module Admin
   module OrdersHelper
     def orders_status_label(status)
-      status == 'complete' ? '完了' : '新規'
+      Order::STATUS_LABELS[status]
     end
 
     def payment_status_label(status)

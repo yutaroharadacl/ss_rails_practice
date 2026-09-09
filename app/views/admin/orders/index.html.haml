@@ -1,29 +1,51 @@
 %h1 受注管理
 
-%table.table
-  %thead
-    %tr
-      %th ID
-      %th 受注日
-      %th 受注番号
-      %th 顧客番号
-      %th 名前
-      %th 対応状況
-      %th 支払い方法
-      %th 決済状況
-      %th 合計
-      %th 操作
-  %tbody
-    - @orders.each do |order|
+= render layout: 'panel', locals: { title: '検索' } do
+  = search_form_for @q, url: admin_orders_path do |f|
+    .row
+      .col-sm-3
+        .form-group
+          = f.label :id_eq, 'ID'
+          = f.search_field :id_eq, class: 'form-control'
+      .col-sm-3
+        .form-group
+          = f.label :order_number_cont, '受注番号'
+          = f.search_field :order_number_cont, class: 'form-control'
+      .col-sm-3
+        .form-group
+          = f.label :status_eq, '対応状況'
+          = f.select :status_eq, Order::STATUS_LABELS.map { |value, label| [label, value] }, { include_blank: '未選択' }, { class: 'form-control' }
+    .text-right
+      = link_to 'クリア', admin_orders_path, class: 'btn btn-default'
+      = f.submit '検索', class: 'btn btn-primary'
+
+- if @orders.present? || !@searched
+  %table.table
+    %thead
       %tr
-        %td= order.id
-        -# strftimeで日時を好きなフォーマットに変えられる
-        %td= order.created_at.strftime('%Y/%m/%d %H:%M:%S') 
-        %td= order.order_number
-        %td
-        %td ダミー 
-        %td= orders_status_label(order.status)
-        %td クレジット支払い
-        %td= payment_status_label(order.payment_status)
-        %td= number_to_currency(order.total)
-        %td= link_to "詳細", admin_order_path(order)
+        %th ID
+        %th 受注日
+        %th 受注番号
+        %th 顧客番号
+        %th 名前
+        %th 対応状況
+        %th 支払い方法
+        %th 決済状況
+        %th 合計
+        %th 操作
+    %tbody
+      - @orders.each do |order|
+        %tr
+          %td= order.id
+          -# strftimeで日時を好きなフォーマットに変えられる
+          %td= order.created_at.strftime('%Y/%m/%d %H:%M:%S')
+          %td= order.order_number
+          %td
+          %td ダミー
+          %td= orders_status_label(order.status)
+          %td クレジット支払い
+          %td= payment_status_label(order.payment_status)
+          %td= number_to_currency(order.total)
+          %td= link_to "詳細", admin_order_path(order)
+- else
+  %p 該当する受注が見つかりませんでした。

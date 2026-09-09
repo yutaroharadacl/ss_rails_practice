@@ -13,7 +13,7 @@
     %tbody
       - @cart.cart_items.each do |item|
         %tr
-          %td= item.product.name
+          %td= item.product&.name || '削除された商品'
           %td= item.quantity
           %td= number_to_currency(item.unit_price)
       %tr

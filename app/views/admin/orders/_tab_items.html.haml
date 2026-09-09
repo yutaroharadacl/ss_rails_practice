@@ -16,8 +16,8 @@
             = f.fields_for :order_items do |item_form|
               %tr
                 = item_form.hidden_field :id
-                %td= item_form.object.product.name
-                %td= item_form.object.product.sku.code
+                %td= item_form.object.product&.name || '削除された商品'
+                %td= item_form.object.product&.sku&.code || '-'
                 %td
                   = item_form.number_field :price
                   円

@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
   private
 
   def existing_cart
-    @existing_cart ||= Cart.find_by(id: session[:cart_id])
+    @existing_cart ||= Cart.includes(cart_items: { product: :sku }).find_by(id: session[:cart_id])
   end
 
   def current_cart

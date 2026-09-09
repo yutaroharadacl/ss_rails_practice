@@ -46,7 +46,7 @@ module Admin
     end
 
     def set_order
-      @order = Order.find(params[:id])
+      @order = Order.includes(order_items: { product: :sku }).find(params[:id])
     end
 
     # 編集不可（complete）の場合は弾く

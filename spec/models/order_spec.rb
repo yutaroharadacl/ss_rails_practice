@@ -3,20 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe Order, type: :model do
-  let!(:product1) do
-    store = Store.create!(name: '店舗1', code: 'STORE1')
-    product = store.products.build(name: 'りんご', description: '説明', published: true)
-    product.build_sku(code: 'APPLE', price: 500, stock_quantity: 10)
-    product.save!
-    product
-  end
-  let!(:product2) do
-    store = Store.create!(name: '店舗2', code: 'STORE2')
-    product = store.products.build(name: 'みかん', description: '説明', published: true)
-    product.build_sku(code: 'ORANGE', price: 300, stock_quantity: 10)
-    product.save!
-    product
-  end
+  let!(:store) { Store.create!(name: '店舗', code: 'STORE') }
+  let!(:product1) { create_product!(store: store, name: 'りんご', code: 'APPLE', price: 500) }
+  let!(:product2) { create_product!(store: store, name: 'みかん', code: 'ORANGE', price: 300) }
 
   describe 'statusのバリデーション' do
     it 'new もしくは complete であれば有効' do

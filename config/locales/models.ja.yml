@@ -8,6 +8,7 @@ ja:
         status: 対応状況
         payment_status: 決済状況
       order_item:
+        product: 商品
         product_id: 商品ID
         price: 単価
         quantity: 個数

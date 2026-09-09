@@ -4,13 +4,8 @@ require 'rails_helper'
 
 RSpec.describe 'Admin::Orders', type: :request do
   let!(:order) { Order.create(status: 'new') }
-  let!(:product) do
-    store = Store.create!(name: '店舗', code: 'STORE')
-    product = store.products.build(name: 'りんご', description: '説明', published: true)
-    product.build_sku(code: 'APPLE', price: 1000, stock_quantity: 10)
-    product.save!
-    product
-  end
+  let!(:store) { Store.create!(name: '店舗', code: 'STORE') }
+  let!(:product) { create_product!(store: store, name: 'りんご', code: 'APPLE', price: 1000) }
 
   describe 'GET /admin/orders' do
     it '一覧が正常に取得できる' do
@@ -74,6 +69,15 @@ RSpec.describe 'Admin::Orders', type: :request do
       expect(response.body).to include('value="1000"')
       expect(response.body).to include('個数')
       expect(response.body).to include('value="2"')
+      expect(response.body).to include('りんご')
+      expect(response.body).to include('APPLE')
+    end
+
+    it '商品が削除されている場合でもエラーにならず「削除された商品」と表示される' do
+      product.destroy!
+      get admin_order_path(order)
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include('削除された商品')
     end
   end
 

@@ -2,12 +2,12 @@
 
 class SidebarMenu
   def self.menu_items
-    demo_store = Store.find_by(code: 'DEMO')
+    demo_store = Store.find_by(code: 'DEMO') || Store.order(:id).first
     products_admin_path =
       if demo_store
         "/admin/stores/#{demo_store.id}/products"
       else
-        '/products'
+        '/admin/orders'
       end
 
     [

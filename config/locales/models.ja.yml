@@ -11,3 +11,14 @@ ja:
         product_id: 商品ID
         price: 単価
         quantity: 個数
+      store:
+        name: 店舗名
+        code: 店舗コード
+      product:
+        name: 商品名
+        description: 説明
+        published: 公開
+      sku:
+        code: SKUコード
+        price: 価格
+        stock_quantity: 在庫数

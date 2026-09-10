@@ -26,8 +26,6 @@ module Admin
 
     def show
       @breadcrumbs = [{ name: '受注管理', path: admin_orders_path }, { name: '受注詳細' }]
-      # 商品追加モーダルの初期表示（検索前）に出す候補商品
-      @products = @order.selectable_products
     end
 
     def update

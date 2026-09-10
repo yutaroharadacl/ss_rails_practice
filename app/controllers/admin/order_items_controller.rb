@@ -2,14 +2,16 @@
 
 module Admin
   class OrderItemsController < ApplicationController
-    # 受注（set_order）と商品（create）のどちらのfindで発生した例外かをe.modelで見分ける。
-    # 受注が無い場合は詳細画面を描けないので一覧へ、商品が無い場合は受注商品管理タブへ戻す。
-    rescue_from ActiveRecord::RecordNotFound do |e|
-      if e.model == 'Product'
-        redirect_to admin_order_path(@order, anchor: 'tab-items'),
-                    alert: t('flash.admin.order_items.error.not_found')
+    rescue_from ActiveRecord::RecordNotFound do |_e|
+      redirect_to admin_orders_path, alert: t('flash.admin.orders.error.not_found')
+    end
+
+    # ransackに桁あふれする値を渡された場合の型キャストエラー対策（admin/orders_controllerと同じ理由）
+    rescue_from ActiveModel::RangeError do |_e|
+      if @order
+        redirect_to items_tab_path, alert: t('flash.admin.order_items.error.invalid_search')
       else
-        redirect_to admin_orders_path, alert: t('flash.admin.orders.error.not_found')
+        redirect_to admin_orders_path, alert: t('flash.admin.orders.error.invalid_search')
       end
     end
 
@@ -22,16 +24,33 @@ module Admin
     end
 
     def create
+      # 単価はOrderItemのbefore_validationがSKUから補う（フォームの値は受け取らない）
       order_item = @order.order_items.build(order_item_params)
-      product = Product.find(order_item_params[:product_id])
-      order_item.price = product.sku.price
-      redirect_after_save(order_item)
+      if order_item.save
+        redirect_to items_tab_path(reopen: true), notice: t('flash.admin.order_items.create.notice')
+      else
+        redirect_to items_tab_path(reopen: true), alert: order_item.errors.full_messages.join(', ')
+      end
     end
 
     private
 
     def order_item_params
       params.require(:order_item).permit(:product_id, :quantity)
+    end
+
+    # 追加後もモーダルの検索条件を引き継げるよう、絞り込み条件だけを取り出す
+    def search_params
+      return {} if params[:q].blank?
+
+      params.require(:q).permit(:name_cont, :sku_code_cont).to_h.reject { |_key, value| value.blank? }
+    end
+
+    # 受注商品管理タブへの戻り先。reopen: trueなら商品追加モーダルを開いた状態で戻る。
+    def items_tab_path(reopen: false)
+      options = { anchor: 'tab-items' }
+      options.merge!(open_modal: 1, q: search_params.presence) if reopen
+      admin_order_path(@order, options.compact)
     end
 
     def set_order
@@ -41,15 +60,7 @@ module Admin
     def check_order_completed
       return if @order.editable?
 
-      redirect_to admin_order_path(@order, anchor: 'tab-items'), alert: t('flash.admin.orders.error.not_editable')
-    end
-
-    def redirect_after_save(order_item)
-      if order_item.save
-        redirect_to admin_order_path(@order, anchor: 'tab-items'), notice: t('flash.admin.order_items.create.notice')
-      else
-        redirect_to admin_order_path(@order, anchor: 'tab-items'), alert: order_item.errors.full_messages.join(', ')
-      end
+      redirect_to items_tab_path, alert: t('flash.admin.orders.error.not_editable')
     end
   end
 end

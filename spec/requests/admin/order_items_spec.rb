@@ -7,6 +7,13 @@ RSpec.describe 'Admin::OrderItems', type: :request do
   let!(:store) { Store.create!(name: '店舗', code: 'STORE') }
   let!(:product) { create_product!(store: store, name: 'りんご', code: 'APPLE', sku_attributes: { price: 1000 }) }
 
+  # 追加後は同じ絞り込み状態でモーダルを開き直せるようにリダイレクトする
+  def items_tab_path(reopen: false, search: nil)
+    options = { anchor: 'tab-items' }
+    options.merge!(open_modal: 1, q: search) if reopen
+    admin_order_path(order, options.compact)
+  end
+
   describe 'GET /admin/orders/:order_id/order_items/new' do
     let!(:other_product) do
       create_product!(store: store, name: 'みかん', code: 'ORANGE', sku_attributes: { price: 2000 })
@@ -24,6 +31,14 @@ RSpec.describe 'Admin::OrderItems', type: :request do
 
     it 'すでに追加済みの商品は候補に出ない' do
       order.order_items.create!(product_id: product.id, quantity: 1, price: 1000)
+      get new_admin_order_order_item_path(order), xhr: true
+
+      expect(response.body).not_to include('りんご')
+      expect(response.body).to include('みかん')
+    end
+
+    it 'SKUが無い商品は単価を決められないので候補に出ない' do
+      product.sku.destroy!
       get new_admin_order_order_item_path(order), xhr: true
 
       expect(response.body).not_to include('りんご')
@@ -50,13 +65,20 @@ RSpec.describe 'Admin::OrderItems', type: :request do
       expect(response.body).to include('該当する商品がありません')
     end
 
+    it '桁あふれする検索条件を渡されてもエラー画面にならない' do
+      get new_admin_order_order_item_path(order), params: { q: { sku_price_eq: '9' * 30 } }, xhr: true
+
+      expect(response).to redirect_to(items_tab_path)
+      expect(flash[:alert]).to eq(I18n.t('flash.admin.order_items.error.invalid_search'))
+    end
+
     context 'statusがcompleteの場合' do
       let!(:order) { Order.create(status: 'complete') }
 
       it '受注詳細へリダイレクトされる' do
         get new_admin_order_order_item_path(order), xhr: true
 
-        expect(response).to redirect_to(admin_order_path(order, anchor: 'tab-items'))
+        expect(response).to redirect_to(items_tab_path)
       end
     end
   end
@@ -73,24 +95,26 @@ RSpec.describe 'Admin::OrderItems', type: :request do
         expect(order_item.quantity).to eq(2)
       end
 
-      it '単価はSKUの価格が設定される' do
-        post admin_order_order_items_path(order), params: { order_item: { product_id: product.id, quantity: 1 } }
+      # permitに:priceが混入した場合と、SKU価格の適用処理が失われた場合の両方を検知する
+      it '単価はフォームの値ではなくSKUの価格が設定される' do
+        post admin_order_order_items_path(order),
+             params: { order_item: { product_id: product.id, quantity: 1, price: 1 } }
 
         expect(order.order_items.last.price).to eq(product.sku.price)
       end
 
-      it 'フォームから単価を送っても無視され、SKUの価格が設定される' do
-        post admin_order_order_items_path(order),
-             params: { order_item: { product_id: product.id, quantity: 1, price: 1 } }
-
-        expect(order.order_items.last.price).to eq(1000)
-      end
-
-      it '受注商品管理タブへリダイレクトし、成功メッセージが表示される' do
+      it 'モーダルを開いた状態の受注商品管理タブへリダイレクトし、成功メッセージが表示される' do
         post admin_order_order_items_path(order), params: { order_item: { product_id: product.id, quantity: 1 } }
 
-        expect(response).to redirect_to(admin_order_path(order, anchor: 'tab-items'))
+        expect(response).to redirect_to(items_tab_path(reopen: true))
         expect(flash[:notice]).to eq(I18n.t('flash.admin.order_items.create.notice'))
+      end
+
+      it '検索条件を引き継いでリダイレクトする' do
+        post admin_order_order_items_path(order),
+             params: { order_item: { product_id: product.id, quantity: 1 }, q: { name_cont: 'りんご' } }
+
+        expect(response).to redirect_to(items_tab_path(reopen: true, search: { name_cont: 'りんご' }))
       end
 
       it '個数が0の場合は追加されない' do
@@ -110,7 +134,7 @@ RSpec.describe 'Admin::OrderItems', type: :request do
           post admin_order_order_items_path(order), params: { order_item: { product_id: product.id, quantity: 1 } }
         end.to change(OrderItem, :count).by(0)
 
-        expect(response).to redirect_to(admin_order_path(order, anchor: 'tab-items'))
+        expect(response).to redirect_to(items_tab_path(reopen: true))
         expect(flash[:alert]).to be_present
       end
     end
@@ -123,7 +147,7 @@ RSpec.describe 'Admin::OrderItems', type: :request do
           post admin_order_order_items_path(order), params: { order_item: { product_id: product.id, quantity: 1 } }
         end.to change(OrderItem, :count).by(0)
 
-        expect(response).to redirect_to(admin_order_path(order, anchor: 'tab-items'))
+        expect(response).to redirect_to(items_tab_path)
         expect(flash[:alert]).to eq(I18n.t('flash.admin.orders.error.not_editable'))
       end
     end
@@ -141,13 +165,26 @@ RSpec.describe 'Admin::OrderItems', type: :request do
     end
 
     context '存在しない商品を指定した場合' do
-      it '受注商品は追加されない' do
+      it 'バリデーションエラーになり追加されない' do
         expect do
           post admin_order_order_items_path(order), params: { order_item: { product_id: 0, quantity: 1 } }
         end.to change(OrderItem, :count).by(0)
 
-        expect(response).to redirect_to(admin_order_path(order, anchor: 'tab-items'))
-        expect(flash[:alert]).to eq(I18n.t('flash.admin.order_items.error.not_found'))
+        expect(response).to redirect_to(items_tab_path(reopen: true))
+        expect(flash[:alert]).to be_present
+      end
+    end
+
+    context 'SKUが削除された商品を指定した場合' do
+      it '500にならずバリデーションエラーとして扱われる' do
+        product.sku.destroy!
+
+        expect do
+          post admin_order_order_items_path(order), params: { order_item: { product_id: product.id, quantity: 1 } }
+        end.to change(OrderItem, :count).by(0)
+
+        expect(response).to redirect_to(items_tab_path(reopen: true))
+        expect(flash[:alert]).to be_present
       end
     end
   end

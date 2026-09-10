@@ -1,5 +1,5 @@
--# モーダル内の商品候補一覧。show（初期表示）とnew.js.erb（検索後の差し替え）の
--# 両方から呼ばれるため、インスタンス変数ではなくlocalsで受け取る。
+-# モーダル内の商品候補一覧。new.js.erbから呼ばれ、#product-listの中身を差し替える。
+-# 呼び出し元が複数になっても追えるよう、インスタンス変数ではなくlocalsで受け取る。
 - if products.empty?
   .alert.alert-warning 該当する商品がありません
 - else
@@ -23,4 +23,7 @@
               = hidden_field_tag 'order_item[product_id]', product.id
               -# 個数は1固定で追加し、変更は受注商品管理テーブル側で行う
               = hidden_field_tag 'order_item[quantity]', 1
+              -# 追加後もモーダルを同じ絞り込み状態で開き直せるよう、検索条件を持ち回る
+              = hidden_field_tag 'q[name_cont]', params.dig(:q, :name_cont)
+              = hidden_field_tag 'q[sku_code_cont]', params.dig(:q, :sku_code_cont)
               = submit_tag '追加', class: 'btn btn-primary btn-sm'

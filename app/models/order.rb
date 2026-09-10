@@ -25,11 +25,14 @@ class Order < ApplicationRecord
   # accepts_nested_attributes_forに指定するとorderの変更にorder_itemsも含めてあげると自動的に更新してくれる
   accepts_nested_attributes_for :order_items, allow_destroy: true
 
-  # この受注に追加できる商品。すでに入っている商品はOrderItemの一意性バリデーションで
-  # 弾かれるため、あらかじめ候補から除いておく。
+  # この受注に追加できる商品。
+  # - すでに入っている商品はOrderItemの一意性バリデーションで弾かれるので候補から除く
+  # - SKUが無い商品は単価を決められないので候補から除く
   # selectはサブクエリとして展開されるので、商品IDを配列に落とさずに済む。
   def selectable_products
-    Product.includes(:sku).where.not(id: order_items.select(:product_id))
+    Product.includes(:sku)
+           .where(id: Sku.select(:product_id))
+           .where.not(id: order_items.select(:product_id))
   end
 
   def editable?

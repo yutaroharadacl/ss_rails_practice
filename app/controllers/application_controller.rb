@@ -4,7 +4,14 @@ class ApplicationController < ActionController::Base
   # helper_methodを書くとViewからも参照できるようになる
   helper_method :current_cart, :existing_cart
 
+  before_action :configure_permitted_parameters, if: :devise_controller?
+
   private
+
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.permit(:sign_up, keys: %i[name name_kana address phone fax])
+    devise_parameter_sanitizer.permit(:account_update, keys: %i[name name_kana address phone fax])
+  end
 
   def existing_cart
     @existing_cart ||= Cart.includes(cart_items: { product: :sku }).find_by(id: session[:cart_id])

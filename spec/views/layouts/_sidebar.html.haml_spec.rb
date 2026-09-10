@@ -16,6 +16,7 @@ RSpec.describe 'layouts/_sidebar', type: :view do
       ].freeze
       allow(SidebarMenu).to receive(:menu_items).and_return(menu_items)
       allow(view).to receive(:current_major_menu_item).with(menu_items).and_return(menu_items.first)
+      allow(view).to receive(:user_signed_in?).and_return(false)
       render
     end
 
@@ -37,6 +38,7 @@ RSpec.describe 'layouts/_sidebar', type: :view do
       ].freeze
       allow(SidebarMenu).to receive(:menu_items).and_return(menu_items)
       allow(view).to receive(:current_major_menu_item).with(menu_items).and_return(menu_items.first)
+      allow(view).to receive(:user_signed_in?).and_return(false)
       render
     end
 

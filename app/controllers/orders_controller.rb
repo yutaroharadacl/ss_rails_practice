@@ -13,6 +13,12 @@ class OrdersController < ApplicationController
     redirect_to cart_path, alert: e.record.errors.full_messages.join(', ')
   end
 
+  before_action :authenticate_user!
+
+  def index
+    @orders = current_user.orders.order(created_at: :desc)
+  end
+
   def new
     @cart = existing_cart
     @order = Order.new
@@ -33,7 +39,7 @@ class OrdersController < ApplicationController
   end
 
   def show
-    @order = Order.find_by!(order_number: params[:id])
+    @order = current_user.orders.find_by!(order_number: params[:id])
   end
 
   private
@@ -49,7 +55,7 @@ class OrdersController < ApplicationController
   end
 
   def build_order_with_items(cart)
-    order = Order.create!(order_params.merge(payment_status: 'pending'))
+    order = Order.create!(order_params.merge(payment_status: 'pending',user: current_user))
     cart.cart_items.each do |item|
       # TODO: productができたらpriceを入れる
       order.order_items.create!(product_id: item.product_id, quantity: item.quantity, price: 1000)

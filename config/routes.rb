@@ -6,7 +6,7 @@ Rails.application.routes.draw do
     resources :orders, only: %i[index show update]
   end
   root to: 'products#index'
-  resources :orders, only: %i[show]
+  resources :orders, only: %i[index show]
   resource :cart, only: %i[show] do
     resources :orders, only: %i[new create]
   end

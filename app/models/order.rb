@@ -24,6 +24,8 @@ class Order < ApplicationRecord
   # accepts_nested_attributes_forに指定するとorderの変更にorder_itemsも含めてあげると自動的に更新してくれる
   accepts_nested_attributes_for :order_items, allow_destroy: true
 
+  belongs_to :user, optional: true
+
   def editable?
     status == 'new'
   end

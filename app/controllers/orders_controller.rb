@@ -53,10 +53,20 @@ class OrdersController < ApplicationController
   end
 
   def decrement_sku_stock_quantity(cart)
-    cart.cart_items.each do |item|
-      sku = item.product.sku
-      sku.decrement_stock!(item.quantity)
+    ordered_skus_with_quantity(cart).each { |sku, quantity| sku.decrement_stock!(quantity) }
+  end
+
+  # 行ロックは外側のtransactionが終わるまで解放されないため、同時注文でロックの取得順が
+  # 交差するとデッドロックになる。全リクエストで順序を揃えるためSKUのid順に整列する
+  def ordered_skus_with_quantity(cart)
+    pairs = cart.cart_items.map do |item|
+      sku = item.product&.sku
+      # 在庫チェック通過後にSKUが消えた場合も、在庫不足と同じ扱いで注文を止める
+      raise Sku::InsufficientStockError if sku.nil?
+
+      [sku, item.quantity]
     end
+    pairs.sort_by { |sku, _quantity| sku.id }
   end
 
   def build_order_with_items(cart)

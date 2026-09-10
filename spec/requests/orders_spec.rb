@@ -91,6 +91,29 @@ RSpec.describe 'Orders', type: :request do
       expect(other_product.sku.reload.stock_quantity).to eq(1)
     end
 
+    it '在庫チェック通過後に在庫が減っていた場合もカートへ戻し、注文を作らない' do
+      post cart_items_path, params: { cart_item: { product_id: product.id, quantity: 2 } }
+      # before_action の在庫チェックを通過した後に、他の注文で在庫が減ったケースを再現する
+      allow_any_instance_of(Sku).to receive(:decrement_stock!).and_raise(Sku::InsufficientStockError)
+
+      expect { post cart_orders_path, params: { order: order_attrs } }.not_to change(Order, :count)
+      expect(response).to redirect_to(cart_path)
+      expect(flash[:alert]).to eq(I18n.t('flash.orders.error.out_of_stock'))
+      expect(product.sku.reload.stock_quantity).to eq(10)
+    end
+
+    it '在庫はSKUのid順に減算する（デッドロック防止）' do
+      # カートへの投入順とSKUのid順が逆になるように入れる
+      post cart_items_path, params: { cart_item: { product_id: other_product.id, quantity: 1 } }
+      post cart_items_path, params: { cart_item: { product_id: product.id, quantity: 1 } }
+      decremented_ids = []
+      allow_any_instance_of(Sku).to receive(:decrement_stock!) { |sku, _quantity| decremented_ids << sku.id }
+
+      post cart_orders_path, params: { order: order_attrs }
+
+      expect(decremented_ids).to eq([product.sku.id, other_product.sku.id])
+    end
+
     it '注文の保存に失敗した場合は在庫も元に戻る' do
       post cart_items_path, params: { cart_item: { product_id: product.id, quantity: 2 } }
       # 在庫を減らした後の処理が失敗したとき、トランザクションで巻き戻ることを確認する

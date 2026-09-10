@@ -116,8 +116,8 @@ RSpec.describe Sku, type: :model do
       expect(sku.reload.stock_quantity).to eq(3)
     end
 
-    it 'ロック取得後に他の注文で在庫が減っていた場合も InsufficientStockError になる' do
-      # with_lock による読み直しが効いていることの確認。
+    it 'メモリ上の在庫が古い場合でも、読み直した結果で InsufficientStockError になる' do
+      # with_lock による読み直しが効いていることの確認（行ロックそのものの検証ではない）。
       # メモリ上のsku(在庫3)を持ったまま、DB側の在庫だけを1に減らす
       Sku.find(sku.id).update!(stock_quantity: 1)
 

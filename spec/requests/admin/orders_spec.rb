@@ -4,6 +4,8 @@ require 'rails_helper'
 
 RSpec.describe 'Admin::Orders', type: :request do
   let!(:order) { Order.create(status: 'new') }
+  let!(:store) { Store.create!(name: '店舗', code: 'STORE') }
+  let!(:product) { create_product!(store: store, name: 'りんご', code: 'APPLE', sku_attributes: { price: 1000 }) }
 
   describe 'GET /admin/orders' do
     it '一覧が正常に取得できる' do
@@ -52,7 +54,7 @@ RSpec.describe 'Admin::Orders', type: :request do
   end
 
   describe 'GET /admin/orders/:id' do
-    let!(:order_item) { order.order_items.create!(product_id: 1, quantity: 2, price: 1000) }
+    let!(:order_item) { order.order_items.create!(product_id: product.id, quantity: 2, price: 1000) }
     it '詳細が正常に取得できる' do
       get admin_order_path(order)
       expect(response).to have_http_status(:success)
@@ -60,17 +62,27 @@ RSpec.describe 'Admin::Orders', type: :request do
       expect(response.body).to include('受注商品管理')
       expect(response.body).to include('ID')
       expect(response.body).to include('1')
-      expect(response.body).to include('完了にする')
+      expect(response.body).to include('出荷準備中')
+      expect(response.body).to include('対応状況')
       expect(response.body).to include('名前')
       expect(response.body).to include('単価')
       expect(response.body).to include('value="1000"')
       expect(response.body).to include('個数')
       expect(response.body).to include('value="2"')
+      expect(response.body).to include('りんご')
+      expect(response.body).to include('APPLE')
+    end
+
+    it '商品が削除されている場合でもエラーにならず「削除された商品」と表示される' do
+      product.destroy!
+      get admin_order_path(order)
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include('削除された商品')
     end
   end
 
   describe 'PATCH /admin/orders/:id' do
-    let!(:order_item) { order.order_items.create!(product_id: 1, quantity: 2, price: 1000) }
+    let!(:order_item) { order.order_items.create!(product_id: product.id, quantity: 2, price: 1000) }
     context 'statusがnewの場合' do
       it 'statusがcompleteに更新される' do
         patch admin_order_path(order), params: { order: { status: 'complete' } }

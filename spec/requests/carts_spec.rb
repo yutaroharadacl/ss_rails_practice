@@ -3,6 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe 'Carts', type: :request do
+  let!(:store) { Store.create!(name: '店舗', code: 'CARTS-REQ-STORE') }
+  let!(:product) { create_product!(store: store, name: 'りんご', code: 'CARTS-REQ-APPLE') }
+
   describe 'GET /cart' do
     it 'returns http success' do
       get cart_path
@@ -19,7 +22,7 @@ RSpec.describe 'Carts', type: :request do
     end
 
     it '明細があるとき、一覧が表示される' do
-      post cart_items_path, params: { cart_item: { product_id: 1, quantity: 2 } } # Cartに商品を追加
+      post cart_items_path, params: { cart_item: { product_id: product.id, quantity: 2 } } # Cartに商品を追加
 
       get cart_path # 再描画
       expect(response.body).to include('商品名') # 商品名が表示される

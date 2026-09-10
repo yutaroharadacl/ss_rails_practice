@@ -49,6 +49,7 @@ ActiveRecord::Schema.define(version: 2026_09_10_000825) do
     t.string "shipping_prefecture"
     t.string "shipping_city"
     t.string "shipping_address_line"
+    t.date "desired_delivery_date"
     t.index ["order_number"], name: "index_orders_on_order_number", unique: true
     t.index ["user_id"], name: "index_orders_on_user_id"
   end

@@ -4,7 +4,15 @@ require 'rails_helper'
 
 RSpec.describe Sku, type: :model do
   let!(:store) { Store.create!(name: 'SKU店舗', code: 'SKU-STORE') }
-  let!(:product) { store.products.create!(name: 'SKU商品', published: true) }
+  let!(:product) { create_bare_product!(name: 'SKU商品') }
+
+  # Product には validates :sku, presence: true があるため、Sku側の検証を単体でテストするために
+  # あえてSkuを持たない状態のProductをバリデーションをスキップして作成する
+  def create_bare_product!(name:)
+    product = store.products.new(name: name, published: true)
+    product.save!(validate: false)
+    product
+  end
 
   def build_sku(attrs = {})
     Sku.new({
@@ -26,7 +34,7 @@ RSpec.describe Sku, type: :model do
 
     it 'codeが重複する場合は無効' do
       product.create_sku!(code: 'SKU-001', price: 1000, stock_quantity: 1)
-      other_product = store.products.create!(name: '別商品', published: true)
+      other_product = create_bare_product!(name: '別商品')
       sku = Sku.new(product: other_product, code: 'SKU-001', price: 500, stock_quantity: 1)
       expect(sku).not_to be_valid
     end

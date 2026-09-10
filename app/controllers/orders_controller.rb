@@ -57,8 +57,7 @@ class OrdersController < ApplicationController
   def build_order_with_items(cart)
     order = Order.create!(order_params.merge(payment_status: 'pending',user: current_user))
     cart.cart_items.each do |item|
-      # TODO: productができたらpriceを入れる
-      order.order_items.create!(product_id: item.product_id, quantity: item.quantity, price: 1000)
+      order.order_items.create!(product_id: item.product_id, quantity: item.quantity, price: item.unit_price)
     end
     order
   end

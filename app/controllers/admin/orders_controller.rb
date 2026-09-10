@@ -30,7 +30,7 @@ module Admin
 
     def update
       if @order.update(order_params)
-        redirect_to admin_order_path(@order, anchor: params[:tab])
+        redirect_to admin_order_path(@order, anchor: params[:tab]), notice: t('flash.admin.orders.update.notice')
       else
         redirect_to admin_order_path(@order, anchor: params[:tab]), alert: @order.errors.full_messages.join(', ')
       end
@@ -41,11 +41,12 @@ module Admin
     def order_params
       # _destroyは、Railsが「このネストしたレコードを削除対象とする」ために内部的に使う特別なキー名
       params.require(:order).permit(:status, :shipping_postal_code, :shipping_prefecture, :shipping_city,
-                                    :shipping_address_line, order_items_attributes: %i[id price quantity _destroy])
+                                    :shipping_address_line, :desired_delivery_date,
+                                    order_items_attributes: %i[id price quantity _destroy])
     end
 
     def set_order
-      @order = Order.find(params[:id])
+      @order = Order.includes(order_items: { product: :sku }).find(params[:id])
     end
 
     # 編集不可（complete）の場合は弾く

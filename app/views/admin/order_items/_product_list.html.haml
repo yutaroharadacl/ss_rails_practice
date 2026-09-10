@@ -1,0 +1,29 @@
+-# モーダル内の商品候補一覧。new.js.erbから呼ばれ、#product-listの中身を差し替える。
+-# 呼び出し元が複数になっても追えるよう、インスタンス変数ではなくlocalsで受け取る。
+- if products.empty?
+  .alert.alert-warning 該当する商品がありません
+- else
+  %table.table.table-striped.table-middle
+    %thead
+      %tr
+        %th 商品名
+        %th SKUコード
+        %th 価格
+        %th 在庫数
+        %th 操作
+    %tbody
+      - products.each do |product|
+        %tr
+          %td= product.name
+          %td= product.sku&.code
+          %td= number_to_currency(product.sku&.price)
+          %td= product.sku&.stock_quantity
+          %td
+            = form_with url: admin_order_order_items_path(order), method: :post, local: true do
+              = hidden_field_tag 'order_item[product_id]', product.id
+              -# 個数は1固定で追加し、変更は受注商品管理テーブル側で行う
+              = hidden_field_tag 'order_item[quantity]', 1
+              -# 追加後もモーダルを同じ絞り込み状態で開き直せるよう、検索条件を持ち回る
+              = hidden_field_tag 'q[name_cont]', params.dig(:q, :name_cont)
+              = hidden_field_tag 'q[sku_code_cont]', params.dig(:q, :sku_code_cont)
+              = submit_tag '追加', class: 'btn btn-primary btn-sm', data: { disable_with: '追加中...' }

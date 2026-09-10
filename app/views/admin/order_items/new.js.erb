@@ -1,0 +1,4 @@
+// 検索結果でモーダル内の商品一覧だけを差し替える。
+// jはescape_javascriptの別名で、HTML内の改行やクォートをJS文字列として安全な形に変換する。
+// #product-list は _add_product_modal.html.haml のidと対応している。
+$('#product-list').html('<%= j render "admin/order_items/product_list", products: @products, order: @order %>');

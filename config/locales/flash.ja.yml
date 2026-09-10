@@ -28,3 +28,8 @@ ja:
           not_editable: "完了済みの受注は編集できません"
           not_found: "対象の注文が見つかりませんでした。"
           invalid_search: "検索条件が不正です。"
+      order_items:
+        create:
+          notice: "商品を追加しました。"
+        error:
+          duplicate: "この商品はすでに追加されています。"

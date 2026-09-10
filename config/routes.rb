@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  devise_for :users
   namespace :admin do
     resources :orders, only: %i[index show update]
   end

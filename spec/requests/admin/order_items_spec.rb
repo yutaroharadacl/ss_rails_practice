@@ -65,11 +65,19 @@ RSpec.describe 'Admin::OrderItems', type: :request do
       expect(response.body).to include('該当する商品がありません')
     end
 
-    it '桁あふれする検索条件を渡されてもエラー画面にならない' do
-      get new_admin_order_order_item_path(order), params: { q: { sku_price_eq: '9' * 30 } }, xhr: true
+    it 'UIに無い検索述語は許可リストで捨てられる' do
+      get new_admin_order_order_item_path(order), params: { q: { sku_price_eq: 1000 } }, xhr: true
 
-      expect(response).to redirect_to(items_tab_path)
-      expect(flash[:alert]).to eq(I18n.t('flash.admin.order_items.error.invalid_search'))
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include('りんご')
+      expect(response.body).to include('みかん')
+    end
+
+    it '桁あふれする受注IDを渡されてもエラー画面にならない' do
+      get new_admin_order_order_item_path(order_id: '9' * 30), xhr: true
+
+      expect(response).to redirect_to(admin_orders_path)
+      expect(flash[:alert]).to eq(I18n.t('flash.admin.orders.error.not_found'))
     end
 
     context 'statusがcompleteの場合' do
@@ -136,6 +144,17 @@ RSpec.describe 'Admin::OrderItems', type: :request do
 
         expect(response).to redirect_to(items_tab_path(reopen: true))
         expect(flash[:alert]).to be_present
+      end
+    end
+
+    context '一意制約違反が起きた場合' do
+      it '500にならず重複メッセージでリダイレクトされる' do
+        allow_any_instance_of(OrderItem).to receive(:save).and_raise(ActiveRecord::RecordNotUnique)
+
+        post admin_order_order_items_path(order), params: { order_item: { product_id: product.id, quantity: 1 } }
+
+        expect(response).to redirect_to(items_tab_path(reopen: true))
+        expect(flash[:alert]).to eq(I18n.t('flash.admin.order_items.error.duplicate'))
       end
     end
 

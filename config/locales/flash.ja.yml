@@ -32,4 +32,4 @@ ja:
         create:
           notice: "商品を追加しました。"
         error:
-          invalid_search: "検索条件が不正です。"
+          duplicate: "この商品はすでに追加されています。"

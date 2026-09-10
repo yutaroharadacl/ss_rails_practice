@@ -8,8 +8,9 @@ class OrderItem < ApplicationRecord
   validates :price, numericality: { greater_than_or_equal_to: 0 }
   validates :quantity, numericality: { only_integer: true, greater_than: 0 }
 
-  # 単価は商品のSKU価格を採用する。フォームから受け取った値で上書きされないよう、
-  # priceが未設定のときだけ補う（カートからの注文確定は自分でpriceを渡すのでそちらが優先される）。
+  # priceが未設定のときだけSKU価格を補う。フォーム値を捨てているのは
+  # order_item_paramsのpermitに:priceが無いからで、ここは上書き防止の処理ではない。
+  # カートからの注文確定はpriceを渡してくるので、その値をそのまま使う。
   before_validation :apply_sku_price, on: :create
 
   def subtotal

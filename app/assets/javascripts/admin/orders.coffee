@@ -22,3 +22,5 @@ $(document).on 'shown.bs.modal', '#add-product-modal', ->
 $(document).on 'turbolinks:load', ->
   if window.location.search.indexOf('open_modal=1') >= 0
     $('#add-product-modal').modal('show')
+    # 一度きりのフラグなので、開いたらURLから消す（リロードや戻るで再度開かないように）
+    history.replaceState({}, '', window.location.pathname + window.location.hash)

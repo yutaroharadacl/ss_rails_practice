@@ -26,4 +26,4 @@
               -# 追加後もモーダルを同じ絞り込み状態で開き直せるよう、検索条件を持ち回る
               = hidden_field_tag 'q[name_cont]', params.dig(:q, :name_cont)
               = hidden_field_tag 'q[sku_code_cont]', params.dig(:q, :sku_code_cont)
-              = submit_tag '追加', class: 'btn btn-primary btn-sm'
+              = submit_tag '追加', class: 'btn btn-primary btn-sm', data: { disable_with: '追加中...' }

@@ -6,21 +6,19 @@ module Admin
       redirect_to admin_orders_path, alert: t('flash.admin.orders.error.not_found')
     end
 
-    # ransackに桁あふれする値を渡された場合の型キャストエラー対策（admin/orders_controllerと同じ理由）
-    rescue_from ActiveModel::RangeError do |_e|
-      if @order
-        redirect_to items_tab_path, alert: t('flash.admin.order_items.error.invalid_search')
-      else
-        redirect_to admin_orders_path, alert: t('flash.admin.orders.error.invalid_search')
-      end
+    rescue_from ActiveRecord::RecordNotUnique do |_e|
+      redirect_to items_tab_path(reopen: true), alert: t('flash.admin.order_items.error.duplicate')
     end
 
     before_action :set_order
     before_action :check_order_completed
 
     def new
-      @q = @order.selectable_products.ransack(params[:q])
+      # createと同じ許可リストを使い、UIに無い述語（sku_price_eqなど）は受け付けない
+      @q = @order.selectable_products.ransack(search_params)
       @products = @q.result
+      # モーダル内の差し替え専用。直接GETされた場合は406を返す（new.html.haml は無い）
+      respond_to(&:js)
     end
 
     def create

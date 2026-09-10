@@ -1,0 +1,26 @@
+-# モーダル内の商品候補一覧。show（初期表示）とnew.js.erb（検索後の差し替え）の
+-# 両方から呼ばれるため、インスタンス変数ではなくlocalsで受け取る。
+- if products.empty?
+  .alert.alert-warning 該当する商品がありません
+- else
+  %table.table.table-striped.table-middle
+    %thead
+      %tr
+        %th 商品名
+        %th SKUコード
+        %th 価格
+        %th 在庫数
+        %th 操作
+    %tbody
+      - products.each do |product|
+        %tr
+          %td= product.name
+          %td= product.sku&.code
+          %td= number_to_currency(product.sku&.price)
+          %td= product.sku&.stock_quantity
+          %td
+            = form_with url: admin_order_order_items_path(order), method: :post, local: true do
+              = hidden_field_tag 'order_item[product_id]', product.id
+              -# 個数は1固定で追加し、変更は受注商品管理テーブル側で行う
+              = hidden_field_tag 'order_item[quantity]', 1
+              = submit_tag '追加', class: 'btn btn-primary btn-sm'

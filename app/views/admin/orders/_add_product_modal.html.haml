@@ -1,0 +1,24 @@
+-# 商品追加モーダル。既存のform_withの内側に置くとフォームが入れ子になるため、
+-# show.html.hamlの.tab-contentの外側から描画している。
+#add-product-modal.modal.fade{tabindex: -1, role: 'dialog'}
+  .modal-dialog.modal-lg{role: 'document'}
+    .modal-content
+      .modal-header
+        %button.close{type: 'button', data: { dismiss: 'modal' }}
+          %span{aria: { hidden: true }} ×
+        %h4.modal-title 商品を追加
+      .modal-body
+        -# 検索フォームは差し替え範囲の外に置く。中に入れると再描画のたびに
+        -# 入力欄が作り直され、フォーカスや入力中の文字が失われる。
+        = form_with url: new_admin_order_order_item_path(@order), method: :get, local: false do
+          .form-group
+            = label_tag 'q[name_cont]', '商品名'
+            = text_field_tag 'q[name_cont]', params.dig(:q, :name_cont), class: 'form-control', placeholder: '部分一致', autocomplete: 'off'
+          .form-group
+            = label_tag 'q[sku_code_cont]', 'SKUコード'
+            = text_field_tag 'q[sku_code_cont]', params.dig(:q, :sku_code_cont), class: 'form-control', placeholder: '部分一致', autocomplete: 'off'
+          .form-group
+            = submit_tag '検索', class: 'btn btn-primary'
+        -# new.js.erbが中身を差し替える箱。idを変える場合はnew.js.erbも合わせること。
+        #product-list
+          = render 'admin/order_items/product_list', products: @products, order: @order

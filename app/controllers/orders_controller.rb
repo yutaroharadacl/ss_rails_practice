@@ -13,20 +13,23 @@ class OrdersController < ApplicationController
     redirect_to cart_path, alert: e.record.errors.full_messages.join(', ')
   end
 
+  # 在庫チェック通過後に他の注文で在庫が減った場合、Sku側のバリデーションメッセージではなく
+  # 購入者向けの文言を出すため、専用の例外を捕まえる
+  rescue_from Sku::InsufficientStockError do |_e|
+    redirect_to cart_path, alert: t('flash.orders.error.out_of_stock')
+  end
+
+  before_action :set_cart, only: %i[new create]
+  before_action :ensure_cart_present, only: %i[create]
+  before_action :ensure_stock_available, only: %i[new create]
+
   def new
-    @cart = existing_cart
     @order = Order.new
     @breadcrumbs = [{ name: 'カート', path: cart_path }, { name: '注文確認' }]
   end
 
   def create
-    cart = existing_cart
-    if cart.nil? || cart.cart_items.empty?
-      redirect_to cart_path, alert: t('flash.orders.error.empty_cart')
-      return
-    end
-
-    order = create_order_from_cart(cart)
+    order = create_order_from_cart(@cart)
     session.delete(:cart_id)
 
     redirect_to order_path(order.order_number)
@@ -41,11 +44,19 @@ class OrdersController < ApplicationController
   def create_order_from_cart(cart)
     order = nil
     ActiveRecord::Base.transaction do
+      decrement_sku_stock_quantity(cart)
       order = build_order_with_items(cart)
       confirm_payment!(order)
       cart.destroy
     end
     order
+  end
+
+  def decrement_sku_stock_quantity(cart)
+    cart.cart_items.each do |item|
+      sku = item.product.sku
+      sku.decrement_stock!(item.quantity)
+    end
   end
 
   def build_order_with_items(cart)
@@ -63,5 +74,23 @@ class OrdersController < ApplicationController
 
   def order_params
     params.require(:order).permit(:shipping_postal_code, :shipping_prefecture, :shipping_city, :shipping_address_line)
+  end
+
+  def set_cart
+    @cart = existing_cart
+  end
+
+  def ensure_cart_present
+    return if @cart.present? && @cart.cart_items.any?
+
+    redirect_to cart_path, alert: t('flash.orders.error.empty_cart')
+  end
+
+  # newは空カートでも「カートは空です」を表示する仕様なので、ここでは空カートを素通りさせる
+  def ensure_stock_available
+    return if @cart.nil? || @cart.cart_items.empty?
+    return if @cart.cart_items.all? { |item| item.product&.sku&.enough_stock?(item.quantity) }
+
+    redirect_to cart_path, alert: t('flash.orders.error.out_of_stock')
   end
 end

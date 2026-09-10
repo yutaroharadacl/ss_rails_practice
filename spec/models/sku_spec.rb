@@ -77,4 +77,52 @@ RSpec.describe Sku, type: :model do
       expect(sku.in_stock?).to eq(false)
     end
   end
+
+  describe '#enough_stock?' do
+    let(:sku) { product.create_sku!(code: 'SKU-ENOUGH', price: 1000, stock_quantity: 3) }
+
+    it '在庫より少ない数量の場合は true' do
+      expect(sku.enough_stock?(2)).to eq(true)
+    end
+
+    it '在庫と同じ数量の場合は true' do
+      expect(sku.enough_stock?(3)).to eq(true)
+    end
+
+    it '在庫を超える数量の場合は false' do
+      expect(sku.enough_stock?(4)).to eq(false)
+    end
+
+    it '数量がnilの場合は false' do
+      expect(sku.enough_stock?(nil)).to eq(false)
+    end
+  end
+
+  describe '#decrement_stock!' do
+    let(:sku) { product.create_sku!(code: 'SKU-DECREMENT', price: 1000, stock_quantity: 3) }
+
+    it '指定した数量だけ在庫が減る' do
+      sku.decrement_stock!(2)
+      expect(sku.reload.stock_quantity).to eq(1)
+    end
+
+    it '在庫と同じ数量の場合は在庫が0になる' do
+      sku.decrement_stock!(3)
+      expect(sku.reload.stock_quantity).to eq(0)
+    end
+
+    it '在庫を超える数量の場合は InsufficientStockError になり、在庫は変わらない' do
+      expect { sku.decrement_stock!(4) }.to raise_error(Sku::InsufficientStockError)
+      expect(sku.reload.stock_quantity).to eq(3)
+    end
+
+    it 'ロック取得後に他の注文で在庫が減っていた場合も InsufficientStockError になる' do
+      # with_lock による読み直しが効いていることの確認。
+      # メモリ上のsku(在庫3)を持ったまま、DB側の在庫だけを1に減らす
+      Sku.find(sku.id).update!(stock_quantity: 1)
+
+      expect { sku.decrement_stock!(3) }.to raise_error(Sku::InsufficientStockError)
+      expect(sku.reload.stock_quantity).to eq(1)
+    end
+  end
 end

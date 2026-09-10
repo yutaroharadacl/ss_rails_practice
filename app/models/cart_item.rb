@@ -16,10 +16,10 @@ class CartItem < ApplicationRecord
   private
 
   def quantity_must_not_exceed_stock
-    stock = product&.sku&.stock_quantity
-    return if stock.nil? || quantity.blank?
-    return if quantity <= stock
+    sku = product&.sku
+    return if sku.nil? || quantity.blank?
+    return if sku.enough_stock?(quantity)
 
-    errors.add(:quantity, "は在庫数（#{stock}）以下にしてください")
+    errors.add(:quantity, "は在庫数（#{sku.stock_quantity}）以下にしてください")
   end
 end

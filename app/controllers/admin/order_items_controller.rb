@@ -10,6 +10,10 @@ module Admin
       redirect_to items_tab_path(reopen: true), alert: t('flash.admin.order_items.error.duplicate')
     end
 
+    rescue_from Sku::InsufficientStockError do |_e|
+      redirect_to items_tab_path(reopen: true), alert: t('flash.admin.order_items.error.out_of_stock')
+    end
+
     before_action :set_order
     before_action :check_order_completed
 
@@ -24,7 +28,7 @@ module Admin
     def create
       # 単価はOrderItemのbefore_validationがSKUから補う（フォームの値は受け取らない）
       order_item = @order.order_items.build(order_item_params)
-      if order_item.save
+      if save_order_item_and_decrement_stock(order_item)
         redirect_to items_tab_path(reopen: true), notice: t('flash.admin.order_items.create.notice')
       else
         redirect_to items_tab_path(reopen: true), alert: order_item.errors.full_messages.join(', ')
@@ -32,6 +36,17 @@ module Admin
     end
 
     private
+
+    # order_itemの保存と在庫減算を1つのtransactionにまとめ、在庫不足時は
+    # order_itemの保存も含めてロールバックする
+    def save_order_item_and_decrement_stock(order_item)
+      ActiveRecord::Base.transaction do
+        next false unless order_item.save
+
+        order_item.product.sku.decrement_stock!(order_item.quantity)
+        true
+      end
+    end
 
     def order_item_params
       params.require(:order_item).permit(:product_id, :quantity)

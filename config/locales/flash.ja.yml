@@ -10,6 +10,7 @@ ja:
         duplicate_order_number: "注文番号の発行に失敗しました。もう一度お試しください。"
         not_found: "対象の注文が見つかりませんでした。"
         empty_cart: "カートに商品がありません。"
+        out_of_stock: "注文数が在庫数を超えているため注文ができませんでした。"
     admin:
       products:
         create:

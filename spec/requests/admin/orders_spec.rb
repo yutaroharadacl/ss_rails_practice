@@ -105,6 +105,57 @@ RSpec.describe 'Admin::Orders', type: :request do
           } } }
         end.to change(OrderItem, :count).by(-1)
       end
+
+      context 'SKUの在庫連動' do
+        it '注文数を増やすと差分だけ在庫が減る' do
+          patch admin_order_path(order), params: { order: { order_items_attributes: {
+            '0' => { id: order_item.id, quantity: 5 }
+          } } }
+
+          expect(product.sku.reload.stock_quantity).to eq(7)
+        end
+
+        it '注文数を減らすと差分だけ在庫が増える' do
+          patch admin_order_path(order), params: { order: { order_items_attributes: {
+            '0' => { id: order_item.id, quantity: 1 }
+          } } }
+
+          expect(product.sku.reload.stock_quantity).to eq(11)
+        end
+
+        it 'order_itemを削除すると注文数分の在庫が戻る' do
+          patch admin_order_path(order), params: { order: { order_items_attributes: {
+            '0' => { id: order_item.id, _destroy: '1' }
+          } } }
+
+          expect(product.sku.reload.stock_quantity).to eq(12)
+        end
+
+        it '在庫数を超える注文数を指定した場合、更新されず在庫も変わらない' do
+          patch admin_order_path(order), params: { order: { order_items_attributes: {
+            '0' => { id: order_item.id, quantity: 13 }
+          } } }
+
+          expect(order_item.reload.quantity).to eq(2)
+          expect(product.sku.reload.stock_quantity).to eq(10)
+          expect(response).to redirect_to(admin_order_path(order))
+          expect(flash[:alert]).to eq(I18n.t('flash.admin.orders.error.out_of_stock'))
+        end
+
+        it '削除済み商品の明細が含まれていても、その明細に触れない更新は失敗しない' do
+          other_product = create_product!(store: store, name: 'みかん', code: 'ORANGE', sku_attributes: { price: 500 })
+          order.order_items.create!(product_id: other_product.id, quantity: 1, price: 500)
+          other_product.destroy!
+
+          patch admin_order_path(order), params: { order: { order_items_attributes: {
+            '0' => { id: order_item.id, quantity: 3 }
+          } } }
+
+          expect(response).to redirect_to(admin_order_path(order))
+          expect(flash[:notice]).to eq(I18n.t('flash.admin.orders.update.notice'))
+          expect(product.sku.reload.stock_quantity).to eq(9)
+        end
+      end
     end
 
     context 'statusがcompleteの場合' do

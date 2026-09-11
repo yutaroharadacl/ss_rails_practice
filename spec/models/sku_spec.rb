@@ -125,4 +125,21 @@ RSpec.describe Sku, type: :model do
       expect(sku.reload.stock_quantity).to eq(1)
     end
   end
+
+  describe '#increment_stock!' do
+    let(:sku) { product.create_sku!(code: 'SKU-INCREMENT', price: 1000, stock_quantity: 3) }
+
+    it '指定した数量だけ在庫が増える' do
+      sku.increment_stock!(2)
+      expect(sku.reload.stock_quantity).to eq(5)
+    end
+
+    it 'メモリ上の在庫が古い場合でも、with_lockで読み直した結果に加算される' do
+      # decrement_stock!と同様にwith_lockによる読み直しが効いていることの確認
+      Sku.find(sku.id).update!(stock_quantity: 10)
+
+      sku.increment_stock!(2)
+      expect(sku.reload.stock_quantity).to eq(12)
+    end
+  end
 end

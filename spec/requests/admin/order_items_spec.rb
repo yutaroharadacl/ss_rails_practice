@@ -132,6 +132,28 @@ RSpec.describe 'Admin::OrderItems', type: :request do
 
         expect(flash[:alert]).to be_present
       end
+
+      it '注文数分だけSKUの在庫が減算される' do
+        post admin_order_order_items_path(order), params: { order_item: { product_id: product.id, quantity: 3 } }
+
+        expect(product.sku.reload.stock_quantity).to eq(7)
+      end
+    end
+
+    context '在庫数を超える個数を指定した場合' do
+      let!(:product) do
+        create_product!(store: store, name: 'りんご', code: 'APPLE', sku_attributes: { price: 1000, stock_quantity: 2 })
+      end
+
+      it '追加されず、在庫も減らない' do
+        expect do
+          post admin_order_order_items_path(order), params: { order_item: { product_id: product.id, quantity: 3 } }
+        end.to change(OrderItem, :count).by(0)
+
+        expect(product.sku.reload.stock_quantity).to eq(2)
+        expect(response).to redirect_to(items_tab_path(reopen: true))
+        expect(flash[:alert]).to eq(I18n.t('flash.admin.order_items.error.out_of_stock'))
+      end
     end
 
     context 'すでに同じ商品が追加されている場合' do

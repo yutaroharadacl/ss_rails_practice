@@ -1,0 +1,19 @@
+%h1 注文一覧
+
+- if @orders.empty?
+  %p 注文はまだありません
+- else
+  %table.table.table-striped.table-bordered
+    %thead
+      %tr
+        %th 注文番号
+        %th 注文日時
+        %th ステータス
+        %th 決済
+    %tbody
+      - @orders.each do |order|
+        %tr
+          %td= order.order_number
+          %td= order.created_at.in_time_zone('Tokyo').strftime('%Y/%m/%d %H:%M:%S')
+          %td= Order::STATUS_LABELS[order.status] || order.status
+          %td= order.payment_status

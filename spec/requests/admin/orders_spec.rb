@@ -14,7 +14,7 @@ RSpec.describe 'Admin::Orders', type: :request do
       expect(response.body).to include('ID')
       expect(response.body).to include('1')
       expect(response.body).to include('名前')
-      expect(response.body).to include('ダミー')
+      expect(response.body).to include('—')
       expect(response.body).to include('対応状況')
       expect(response.body).to include('新規')
     end

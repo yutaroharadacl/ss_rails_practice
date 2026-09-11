@@ -12,7 +12,6 @@ class OrdersController < ApplicationController
   rescue_from ActiveRecord::RecordInvalid do |e|
     redirect_to cart_path, alert: e.record.errors.full_messages.join(', ')
   end
-
   # 在庫チェック通過後に他の注文で在庫が減った場合、Sku側のバリデーションメッセージではなく
   # 購入者向けの文言を出すため、専用の例外を捕まえる
   rescue_from Sku::InsufficientStockError do |_e|
@@ -22,6 +21,14 @@ class OrdersController < ApplicationController
   before_action :set_cart, only: %i[new create]
   before_action :ensure_cart_present, only: %i[create]
   before_action :ensure_stock_available, only: %i[new create]
+  before_action :authenticate_user!
+
+  def index
+    @orders = current_user.orders.order(created_at: :desc)
+  end
+
+
+
 
   def new
     @order = Order.new
@@ -36,7 +43,7 @@ class OrdersController < ApplicationController
   end
 
   def show
-    @order = Order.find_by!(order_number: params[:id])
+    @order = current_user.orders.find_by!(order_number: params[:id])
   end
 
   private
@@ -70,7 +77,7 @@ class OrdersController < ApplicationController
   end
 
   def build_order_with_items(cart)
-    order = Order.create!(order_params.merge(payment_status: 'pending'))
+    order = Order.create!(order_params.merge(payment_status: 'pending', user: current_user))
     cart.cart_items.each do |item|
       order.order_items.create!(product_id: item.product_id, quantity: item.quantity, price: item.unit_price)
     end

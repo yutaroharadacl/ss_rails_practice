@@ -15,3 +15,7 @@
   = render 'tab_address'
   = render 'tab_shipping'
   = render 'tab_items'
+
+-# モーダルは既存のform_withと入れ子にならないよう.tab-contentの外に置く
+- if @order.editable?
+  = render 'add_product_modal'

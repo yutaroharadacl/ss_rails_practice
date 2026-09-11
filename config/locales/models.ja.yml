@@ -25,3 +25,12 @@ ja:
         code: SKUコード
         price: 価格
         stock_quantity: 在庫数
+      user:
+        email: メールアドレス
+        password: パスワード
+        password_confirmation: パスワード（確認用）
+        name: 名前
+        name_kana: 名前（カナ）
+        address: 住所
+        phone: 電話番号
+        fax: FAX

@@ -3,8 +3,18 @@
 require 'rails_helper'
 
 RSpec.describe 'Orders', type: :request do
+  let!(:user) do
+    User.create!(
+      email: 'buyer@example.com',
+      password: 'password',
+      password_confirmation: 'password',
+      name: '山田太郎'
+    )
+  end
   let!(:store) { Store.create!(name: '店舗', code: 'ORDERS-REQ-STORE') }
   let!(:product) { create_product!(store: store, name: 'りんご', code: 'ORDERS-REQ-APPLE') }
+
+  before { sign_in user }
 
   describe 'GET /orders/new' do
     it 'カートが空のときは空のメッセージを表示する' do
@@ -45,9 +55,30 @@ RSpec.describe 'Orders', type: :request do
 
       order = Order.last
       expect(order.payment_status).to eq('paid')
+      expect(order.user).to eq(user)
       expect(order.order_items.first.quantity).to eq(2)
       expect(Cart.count).to eq(0)
       expect(response).to redirect_to(order_path(order.order_number))
+    end
+  end
+
+  describe 'GET /orders' do
+    it '自分の注文一覧を表示する' do
+      order = user.orders.create!(status: 'new', payment_status: 'paid')
+      get orders_path
+      expect(response).to have_http_status(:success)
+      expect(response.body).to include(order.order_number)
+      expect(response.body).not_to include('詳細')
+    end
+  end
+
+  describe 'GET /orders/:id' do
+    it '他人の注文は参照できない' do
+      other = User.create!(email: 'other@example.com', password: 'password', password_confirmation: 'password')
+      other_order = other.orders.create!(status: 'new', payment_status: 'paid')
+
+      get order_path(other_order.order_number)
+      expect(response).to redirect_to(cart_path)
     end
   end
 end

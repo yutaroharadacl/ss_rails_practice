@@ -21,7 +21,7 @@ module Admin
       @q = Order.ransack(params[:q])
       @searched = params[:q].present?
       # distinct: true は、検索条件によっては内部でJOINが発生して同じ受注が複数行返ってくることがあるので、それを防ぐため
-      @orders = @q.result(distinct: true).includes(:order_items)
+      @orders = @q.result(distinct: true).includes(:order_items, :user)
     end
 
     def show
@@ -46,7 +46,7 @@ module Admin
     end
 
     def set_order
-      @order = Order.includes(order_items: { product: :sku }).find(params[:id])
+      @order = Order.includes(:user, order_items: { product: :sku }).find(params[:id])
     end
 
     # 編集不可（complete）の場合は弾く

@@ -5,12 +5,21 @@
     =render 'panel_row', label: '対応状況', value: orders_status_label(@order.status)
     =render 'panel_row', label: 'お届け日', value: @order.desired_delivery_date&.strftime('%Y/%m/%d')
 
-  -# TODO: ユーザーテーブルから引っ張る
+  - user = @order.user
   =render layout: 'panel', locals: { title: '購入者情報' } do
-    =render 'panel_row', label: '顧客番号', value: 'ダミー'
-    =render 'panel_row', label: '名前', value: 'ダミー'
-    =render 'panel_row', label: '名前(カナ)', value: 'ダミー'
-    =render 'panel_row', label: '住所', value: 'ダミー'
-    =render 'panel_row', label: '電話番号', value: 'ダミー'
-    =render 'panel_row', label: 'FAX', value: 'ダミー'
-    =render 'panel_row', label: 'メールアドレス', value: 'ダミー'
+    - if user
+      =render 'panel_row', label: '顧客番号', value: user.id
+      =render 'panel_row', label: '名前', value: user.name
+      =render 'panel_row', label: '名前(カナ)', value: user.name_kana
+      =render 'panel_row', label: '住所', value: user.address
+      =render 'panel_row', label: '電話番号', value: user.phone
+      =render 'panel_row', label: 'FAX', value: user.fax
+      =render 'panel_row', label: 'メールアドレス', value: user.email
+    - else
+      =render 'panel_row', label: '顧客番号', value: '—'
+      =render 'panel_row', label: '名前', value: '—'
+      =render 'panel_row', label: '名前(カナ)', value: '—'
+      =render 'panel_row', label: '住所', value: '—'
+      =render 'panel_row', label: '電話番号', value: '—'
+      =render 'panel_row', label: 'FAX', value: '—'
+      =render 'panel_row', label: 'メールアドレス', value: '—'

@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  devise_for :users
   namespace :admin do
     resources :orders, only: %i[index show update] do
       resources :order_items, only: %i[new create]
     end
   end
   root to: 'products#index'
-  resources :orders, only: %i[show]
+  resources :orders, only: %i[index show]
   resource :cart, only: %i[show] do
     resources :orders, only: %i[new create]
   end

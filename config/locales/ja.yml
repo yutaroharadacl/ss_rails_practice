@@ -7,3 +7,30 @@ ja:
         precision: 0
         separator: "."
         delimiter: ","
+  errors:
+    messages:
+      accepted: を受諾してください
+      blank: を入力してください
+      confirmation: と一致しません
+      empty: を入力してください
+      equal_to: "は%{count}にしてください"
+      even: は偶数にしてください
+      exclusion: は予約されています
+      greater_than: "は%{count}より大きい値にしてください"
+      greater_than_or_equal_to: "は%{count}以上の値にしてください"
+      inclusion: は一覧にありません
+      invalid: は不正な値です
+      less_than: "は%{count}未満の値にしてください"
+      less_than_or_equal_to: "は%{count}以下の値にしてください"
+      not_a_number: は数値で入力してください
+      not_an_integer: は整数で入力してください
+      odd: は奇数にしてください
+      other_than: "は%{count}以外の値にしてください"
+      required: を入力してください
+      taken: はすでに使用されています
+      too_long: "は%{count}文字以内で入力してください"
+      too_short: "は%{count}文字以上で入力してください"
+      wrong_length: "は%{count}文字で入力してください"
+      restrict_dependent_destroy:
+        one: 他の%{record}が存在しているため削除できません
+        many: 他の%{record}が存在しているため削除できません

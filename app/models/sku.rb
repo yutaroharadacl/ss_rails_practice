@@ -36,6 +36,13 @@ class Sku < ApplicationRecord
     end
   end
 
+  # decrement_stock!と同様に行ロックを取ってから最新の在庫を読み直して加算する
+  def increment_stock!(quantity)
+    with_lock do
+      update!(stock_quantity: stock_quantity + quantity)
+    end
+  end
+
   def self.ransackable_attributes(_auth_object = nil)
     %w[code price]
   end

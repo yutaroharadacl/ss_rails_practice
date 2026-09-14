@@ -2,6 +2,7 @@ ja:
   activerecord:
     attributes:
       cart_item:
+        cart: カート
         product: 商品
         product_id: 商品ID
         quantity: 数量
@@ -9,6 +10,12 @@ ja:
         status: 対応状況
         payment_status: 決済状況
       order_item:
+        order: 注文
+        product: 商品
+        product_id: 商品ID
+        price: 単価
+        quantity: 個数
+      order_items:
         product: 商品
         product_id: 商品ID
         price: 単価
@@ -21,6 +28,7 @@ ja:
         description: 説明
         published: 公開
         sku: SKU
+        store: 店舗
       sku:
         code: SKUコード
         price: 価格
@@ -28,6 +36,7 @@ ja:
         sale_starts_at: セール期間（開始）
         sale_ends_at: セール期間（終了）
         stock_quantity: 在庫数
+        product: 商品
       user:
         email: メールアドレス
         password: パスワード

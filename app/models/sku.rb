@@ -13,7 +13,8 @@ class Sku < ApplicationRecord
             numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :sale_price,
             numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than: :price },
-            allow_nil: true
+            allow_nil: true,
+            if: -> { price.present? }
   validates :stock_quantity,
             presence: true,
             numericality: { only_integer: true, greater_than_or_equal_to: 0 }
@@ -78,13 +79,13 @@ class Sku < ApplicationRecord
     return unless sale_specified?
     return if sale_complete?
 
-    errors.add(:base, 'セール価格とセール期間はセットで入力してください')
+    errors.add(:base, :sale_fields_incomplete)
   end
 
   def sale_period_must_be_in_order
     return if sale_starts_at.blank? || sale_ends_at.blank?
     return if sale_starts_at <= sale_ends_at
 
-    errors.add(:sale_ends_at, 'は開始日時以降にしてください')
+    errors.add(:sale_ends_at, :on_or_after_start)
   end
 end

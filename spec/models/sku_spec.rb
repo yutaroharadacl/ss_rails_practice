@@ -238,6 +238,7 @@ RSpec.describe Sku, type: :model do
       sku = build_sku(sale_price: 800)
       expect(sku).not_to be_valid
       expect(sku.errors[:base]).to be_present
+      expect(sku.errors.full_messages).to include('セール価格とセール期間はセットで入力してください')
     end
 
     it 'セール価格が定価以上の場合は無効' do
@@ -246,10 +247,35 @@ RSpec.describe Sku, type: :model do
       expect(sku.errors[:sale_price]).to be_present
     end
 
+    it 'priceが空でもsale_priceがあると例外にならず無効になる' do
+      sku = build_sku(price: nil, sale_price: 800, sale_starts_at: starts_at, sale_ends_at: ends_at)
+      expect { sku.valid? }.not_to raise_error
+      expect(sku).not_to be_valid
+      expect(sku.errors[:price]).to be_present
+    end
+
     it '終了が開始より前の場合は無効' do
       sku = build_sku(sale_price: 800, sale_starts_at: ends_at, sale_ends_at: starts_at)
       expect(sku).not_to be_valid
       expect(sku.errors[:sale_ends_at]).to be_present
+      expect(sku.errors.full_messages).to include('セール期間（終了）は開始日時以降にしてください')
+    end
+
+    it '商品フォームではネストしたSKUのエラーも日本語で出る' do
+      product = store.products.new(
+        name: 'x',
+        published: true,
+        sku_attributes: {
+          code: 'SKU-NEST',
+          price: 1000,
+          sale_price: 800,
+          stock_quantity: 1
+        }
+      )
+
+      expect(product).not_to be_valid
+      expect(product.errors.full_messages).to include('セール価格とセール期間はセットで入力してください')
+      expect(product.errors.full_messages.join).not_to match(/Sku|base/i)
     end
   end
 end

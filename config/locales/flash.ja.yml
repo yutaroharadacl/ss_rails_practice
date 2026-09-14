@@ -11,6 +11,7 @@ ja:
         not_found: "対象の注文が見つかりませんでした。"
         empty_cart: "カートに商品がありません。"
         out_of_stock: "注文数が在庫数を超えているため注文ができませんでした。"
+        price_changed: "価格が変わったため、注文内容を再確認してください。"
     admin:
       products:
         create:

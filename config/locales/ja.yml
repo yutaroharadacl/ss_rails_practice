@@ -13,6 +13,7 @@ ja:
       long: "%Y/%m/%d %H:%M:%S"
       short: "%Y/%m/%d %H:%M"
   errors:
+    format: "%{attribute}%{message}"
     messages:
       accepted: を受諾してください
       blank: を入力してください

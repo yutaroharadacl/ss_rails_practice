@@ -24,6 +24,9 @@ ja:
       sku:
         code: SKUコード
         price: 価格
+        sale_price: セール価格
+        sale_starts_at: セール期間（開始）
+        sale_ends_at: セール期間（終了）
         stock_quantity: 在庫数
       user:
         email: メールアドレス

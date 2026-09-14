@@ -16,7 +16,7 @@
         %tr
           %td= product.name
           %td= product.sku&.code
-          %td= number_to_currency(product.sku&.price)
+          %td= number_to_currency(product.sku&.current_price)
           %td= product.sku&.stock_quantity
           %td
             = form_with url: admin_order_order_items_path(order), method: :post, local: true do

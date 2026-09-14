@@ -37,4 +37,26 @@ RSpec.describe CartItem, type: :model do
       expect(item).not_to be_valid
     end
   end
+
+  describe '#unit_price' do
+    include ActiveSupport::Testing::TimeHelpers
+
+    it 'セール期間外は定価を返す' do
+      item = CartItem.new(product: product, quantity: 1)
+      expect(item.unit_price).to eq(1000)
+    end
+
+    it 'セール期間内はセール価格を返す' do
+      product.sku.update!(
+        sale_price: 800,
+        sale_starts_at: Time.zone.parse('2026-09-10 10:00:00'),
+        sale_ends_at: Time.zone.parse('2026-09-10 18:00:00')
+      )
+      item = CartItem.new(product: product, quantity: 1)
+
+      travel_to Time.zone.parse('2026-09-10 12:00:00') do
+        expect(item.unit_price).to eq(800)
+      end
+    end
+  end
 end

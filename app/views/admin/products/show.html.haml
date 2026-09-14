@@ -11,6 +11,14 @@
   %dd= @product.sku&.code
   %dt 価格
   %dd= number_to_currency(@product.sku&.price)
+  %dt セール価格
+  %dd= @product.sku&.sale_price.present? ? number_to_currency(@product.sku.sale_price) : '-'
+  %dt セール期間（開始）
+  %dd= @product.sku&.sale_starts_at.present? ? l(@product.sku.sale_starts_at, format: :long) : '-'
+  %dt セール期間（終了）
+  %dd= @product.sku&.sale_ends_at.present? ? l(@product.sku.sale_ends_at, format: :long) : '-'
+  %dt 販売価格
+  %dd= number_to_currency(@product.sku&.current_price)
   %dt 在庫
   %dd= @product.sku&.stock_quantity
 

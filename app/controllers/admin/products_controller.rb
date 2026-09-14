@@ -75,7 +75,7 @@ module Admin
         :name,
         :description,
         :published,
-        sku_attributes: %i[id code price stock_quantity]
+        sku_attributes: %i[id code price stock_quantity sale_price sale_starts_at sale_ends_at]
       )
     end
 

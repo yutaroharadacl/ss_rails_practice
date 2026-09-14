@@ -142,4 +142,140 @@ RSpec.describe Sku, type: :model do
       expect(sku.reload.stock_quantity).to eq(12)
     end
   end
+
+  describe '#on_sale? / #current_price' do
+    include ActiveSupport::Testing::TimeHelpers
+
+    let(:starts_at) { Time.zone.parse('2026-09-10 10:00:00') }
+    let(:ends_at) { Time.zone.parse('2026-09-10 18:00:00') }
+    let(:sale_attrs) do
+      { sale_price: 800, sale_starts_at: starts_at, sale_ends_at: ends_at }
+    end
+
+    it 'セール設定が無い場合は定価' do
+      sku = build_sku
+      expect(sku.on_sale?).to eq(false)
+      expect(sku.current_price).to eq(1000)
+    end
+
+    it 'セール価格だけある場合は定価（期間が不完全）' do
+      sku = build_sku(sale_price: 800)
+      expect(sku.on_sale?).to eq(false)
+      expect(sku.current_price).to eq(1000)
+    end
+
+    it 'セール価格と開始だけある場合は定価（終了が無い）' do
+      sku = build_sku(sale_price: 800, sale_starts_at: starts_at)
+      expect(sku.on_sale?).to eq(false)
+      expect(sku.current_price).to eq(1000)
+    end
+
+    it 'セール価格と終了だけある場合は定価（開始が無い）' do
+      sku = build_sku(sale_price: 800, sale_ends_at: ends_at)
+      expect(sku.on_sale?).to eq(false)
+      expect(sku.current_price).to eq(1000)
+    end
+
+    it '開始前は定価' do
+      sku = build_sku(sale_attrs)
+      travel_to Time.zone.parse('2026-09-10 09:59:59') do
+        expect(sku.on_sale?).to eq(false)
+        expect(sku.current_price).to eq(1000)
+      end
+    end
+
+    it '開始ちょうどはセール価格' do
+      sku = build_sku(sale_attrs)
+      travel_to starts_at do
+        expect(sku.on_sale?).to eq(true)
+        expect(sku.current_price).to eq(800)
+      end
+    end
+
+    it '期間の真ん中はセール価格' do
+      sku = build_sku(sale_attrs)
+      travel_to Time.zone.parse('2026-09-10 12:00:00') do
+        expect(sku.on_sale?).to eq(true)
+        expect(sku.current_price).to eq(800)
+      end
+    end
+
+    it '終了ちょうどはセール価格' do
+      sku = build_sku(sale_attrs)
+      travel_to ends_at do
+        expect(sku.on_sale?).to eq(true)
+        expect(sku.current_price).to eq(800)
+      end
+    end
+
+    it '終了後は定価' do
+      sku = build_sku(sale_attrs)
+      travel_to Time.zone.parse('2026-09-10 18:00:01') do
+        expect(sku.on_sale?).to eq(false)
+        expect(sku.current_price).to eq(1000)
+      end
+    end
+
+    it '開始が終了より後の場合は定価' do
+      sku = build_sku(sale_price: 800, sale_starts_at: ends_at, sale_ends_at: starts_at)
+      travel_to Time.zone.parse('2026-09-10 12:00:00') do
+        expect(sku.on_sale?).to eq(false)
+        expect(sku.current_price).to eq(1000)
+      end
+    end
+  end
+
+  describe 'セールのバリデーション' do
+    let(:starts_at) { Time.zone.parse('2026-09-10 10:00:00') }
+    let(:ends_at) { Time.zone.parse('2026-09-10 18:00:00') }
+
+    it '3項目そろっていれば有効' do
+      sku = build_sku(sale_price: 800, sale_starts_at: starts_at, sale_ends_at: ends_at)
+      expect(sku).to be_valid
+    end
+
+    it 'セール価格だけある場合は無効' do
+      sku = build_sku(sale_price: 800)
+      expect(sku).not_to be_valid
+      expect(sku.errors[:base]).to be_present
+      expect(sku.errors.full_messages).to include('セール価格とセール期間はセットで入力してください')
+    end
+
+    it 'セール価格が定価以上の場合は無効' do
+      sku = build_sku(sale_price: 1000, sale_starts_at: starts_at, sale_ends_at: ends_at)
+      expect(sku).not_to be_valid
+      expect(sku.errors[:sale_price]).to be_present
+    end
+
+    it 'priceが空でもsale_priceがあると例外にならず無効になる' do
+      sku = build_sku(price: nil, sale_price: 800, sale_starts_at: starts_at, sale_ends_at: ends_at)
+      expect { sku.valid? }.not_to raise_error
+      expect(sku).not_to be_valid
+      expect(sku.errors[:price]).to be_present
+    end
+
+    it '終了が開始より前の場合は無効' do
+      sku = build_sku(sale_price: 800, sale_starts_at: ends_at, sale_ends_at: starts_at)
+      expect(sku).not_to be_valid
+      expect(sku.errors[:sale_ends_at]).to be_present
+      expect(sku.errors.full_messages).to include('セール期間（終了）は開始日時以降にしてください')
+    end
+
+    it '商品フォームではネストしたSKUのエラーも日本語で出る' do
+      product = store.products.new(
+        name: 'x',
+        published: true,
+        sku_attributes: {
+          code: 'SKU-NEST',
+          price: 1000,
+          sale_price: 800,
+          stock_quantity: 1
+        }
+      )
+
+      expect(product).not_to be_valid
+      expect(product.errors.full_messages).to include('セール価格とセール期間はセットで入力してください')
+      expect(product.errors.full_messages.join).not_to match(/Sku|base/i)
+    end
+  end
 end

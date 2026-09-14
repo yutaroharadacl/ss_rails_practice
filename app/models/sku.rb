@@ -11,13 +11,31 @@ class Sku < ApplicationRecord
   validates :price,
             presence: true,
             numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :sale_price,
+            numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than: :price },
+            allow_nil: true,
+            if: -> { price.present? }
   validates :stock_quantity,
             presence: true,
             numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :product_id, uniqueness: true
+  validate :sale_fields_must_be_complete
+  validate :sale_period_must_be_in_order
 
   def in_stock?
     stock_quantity.positive?
+  end
+
+  # 今この瞬間の販売単価。セール適用中だけ sale_price、それ以外は定価。
+  def current_price
+    on_sale? ? sale_price : price
+  end
+
+  # セール価格・開始・終了がすべて入り、かつ今が期間内（両端含む）のときだけ true。
+  def on_sale?
+    return false unless sale_complete?
+
+    Time.current.between?(sale_starts_at, sale_ends_at)
   end
 
   def enough_stock?(quantity)
@@ -45,5 +63,29 @@ class Sku < ApplicationRecord
 
   def self.ransackable_attributes(_auth_object = nil)
     %w[code price]
+  end
+
+  private
+
+  def sale_complete?
+    !sale_price.nil? && sale_starts_at.present? && sale_ends_at.present?
+  end
+
+  def sale_specified?
+    !sale_price.nil? || sale_starts_at.present? || sale_ends_at.present?
+  end
+
+  def sale_fields_must_be_complete
+    return unless sale_specified?
+    return if sale_complete?
+
+    errors.add(:base, :sale_fields_incomplete)
+  end
+
+  def sale_period_must_be_in_order
+    return if sale_starts_at.blank? || sale_ends_at.blank?
+    return if sale_starts_at <= sale_ends_at
+
+    errors.add(:sale_ends_at, :on_or_after_start)
   end
 end

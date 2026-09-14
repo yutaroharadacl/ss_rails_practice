@@ -1,5 +1,8 @@
 ja:
   activerecord:
+    models:
+      product: 商品
+      sku: SKU
     attributes:
       cart_item:
         cart: カート
@@ -32,6 +35,9 @@ ja:
       sku:
         code: SKUコード
         price: 価格
+        sale_price: セール価格
+        sale_starts_at: セール期間（開始）
+        sale_ends_at: セール期間（終了）
         stock_quantity: 在庫数
         product: 商品
       user:
@@ -43,3 +49,19 @@ ja:
         address: 住所
         phone: 電話番号
         fax: FAX
+      product/sku:
+        code: SKUコード
+        price: 価格
+        sale_price: セール価格
+        sale_starts_at: セール期間（開始）
+        sale_ends_at: セール期間（終了）
+        stock_quantity: 在庫数
+        base: ""
+    errors:
+      models:
+        sku:
+          attributes:
+            base:
+              sale_fields_incomplete: セール価格とセール期間はセットで入力してください
+            sale_ends_at:
+              on_or_after_start: は開始日時以降にしてください

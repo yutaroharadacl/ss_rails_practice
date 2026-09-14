@@ -31,6 +31,17 @@
       = sf.number_field :price, class: 'form-control', min: 0
 
     .form-group
+      = sf.label :sale_price, 'セール価格（円）'
+      = sf.number_field :sale_price, class: 'form-control', min: 0
+    .form-group
+      = sf.label :sale_starts_at, 'セール期間（開始）'
+      = sf.datetime_local_field :sale_starts_at, class: 'form-control'
+    .form-group
+      = sf.label :sale_ends_at, 'セール期間（終了）'
+      = sf.datetime_local_field :sale_ends_at, class: 'form-control'
+    %p.text-muted セール価格・開始・終了をすべて入れ、かつ現在が期間内のときだけセール価格が使われます。
+
+    .form-group
       = sf.label :stock_quantity, '在庫数'
       = sf.number_field :stock_quantity, class: 'form-control', min: 0
 

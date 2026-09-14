@@ -20,6 +20,6 @@ class OrderItem < ApplicationRecord
   private
 
   def apply_sku_price
-    self.price ||= product&.sku&.price
+    self.price ||= product&.sku&.current_price
   end
 end

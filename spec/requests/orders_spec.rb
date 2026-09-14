@@ -134,6 +134,39 @@ RSpec.describe 'Orders', type: :request do
       expect(response).to redirect_to(cart_path)
       expect(product.sku.reload.stock_quantity).to eq(10)
     end
+
+    context 'セール期間をまたいだ場合' do
+      include ActiveSupport::Testing::TimeHelpers
+
+      let(:starts_at) { Time.zone.parse('2026-09-10 10:00:00') }
+      let(:ends_at) { Time.zone.parse('2026-09-10 18:00:00') }
+
+      before do
+        product.sku.update!(sale_price: 800, sale_starts_at: starts_at, sale_ends_at: ends_at)
+        post cart_items_path, params: { cart_item: { product_id: product.id, quantity: 1 } }
+      end
+
+      it '確認画面と同じ単価ならセール価格で確定する' do
+        travel_to Time.zone.parse('2026-09-10 12:00:00') do
+          get new_cart_order_path
+          post cart_orders_path, params: { order: order_attrs }
+        end
+
+        expect(Order.last.order_items.first.price).to eq(800)
+      end
+
+      it '確認後にセールが終わると確認画面へ戻し、注文を作らない' do
+        travel_to Time.zone.parse('2026-09-10 12:00:00') do
+          get new_cart_order_path
+        end
+
+        travel_to Time.zone.parse('2026-09-10 18:00:01') do
+          expect { post cart_orders_path, params: { order: order_attrs } }.not_to change(Order, :count)
+          expect(response).to redirect_to(new_cart_order_path)
+          expect(flash[:alert]).to eq(I18n.t('flash.orders.error.price_changed'))
+        end
+      end
+    end
   end
 
   describe 'GET /orders/new' do

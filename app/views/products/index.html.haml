@@ -17,7 +17,7 @@
         = label_tag 'q[store_name_cont]', '店舗名'
         = text_field_tag 'q[store_name_cont]', @q.store_name_cont, class: 'form-control', placeholder: '部分一致'
       .form-group
-        %label 価格
+        %label 定価
         .form-inline
           = number_field_tag 'q[sku_price_gteq]', @q.sku_price_gteq, class: 'form-control', min: 0, placeholder: '下限'
           %span{style: 'margin: 0 8px;'} ~
@@ -36,7 +36,8 @@
       %tr
         %th 商品名
         %th 店舗
-        %th 価格
+        %th 定価
+        %th 販売価格
         %th 在庫
     %tbody
       - @products.each do |product|
@@ -44,6 +45,7 @@
           %td= product.name
           %td= product.store.name
           %td= number_to_currency(product.sku&.price)
+          %td= number_to_currency(product.sku&.current_price)
           %td
             - if product.sku&.in_stock?
               = product.sku.stock_quantity

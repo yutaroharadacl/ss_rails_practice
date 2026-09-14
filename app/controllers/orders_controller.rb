@@ -21,14 +21,13 @@ class OrdersController < ApplicationController
   before_action :set_cart, only: %i[new create]
   before_action :ensure_cart_present, only: %i[create]
   before_action :ensure_stock_available, only: %i[new create]
+  before_action :remember_checkout_quote, only: :new
+  before_action :ensure_quoted_prices_match, only: :create
   before_action :authenticate_user!
 
   def index
     @orders = current_user.orders.order(created_at: :desc)
   end
-
-
-
 
   def new
     @order = Order.new
@@ -38,6 +37,7 @@ class OrdersController < ApplicationController
   def create
     order = create_order_from_cart(@cart)
     session.delete(:cart_id)
+    session.delete(:checkout_quote)
 
     redirect_to order_path(order.order_number)
   end
@@ -109,5 +109,24 @@ class OrdersController < ApplicationController
     return if @cart.cart_items.all? { |item| item.product&.sku&.enough_stock?(item.quantity) }
 
     redirect_to cart_path, alert: t('flash.orders.error.out_of_stock')
+  end
+
+  # 確認画面で見せた単価をセッションに残し、確定時に同じ値か照合する
+  def remember_checkout_quote
+    return if @cart.nil? || @cart.cart_items.empty?
+
+    session[:checkout_quote] = checkout_quote
+  end
+
+  def ensure_quoted_prices_match
+    quoted = session[:checkout_quote]
+    return if quoted.blank?
+    return if quoted == checkout_quote
+
+    redirect_to new_cart_order_path, alert: t('flash.orders.error.price_changed')
+  end
+
+  def checkout_quote
+    @cart.cart_items.order(:id).map { |item| [item.product_id, item.quantity, item.unit_price] }
   end
 end

@@ -69,5 +69,40 @@ RSpec.describe 'Products', type: :request do
         expect(response.body).to include('商品C')
       end
     end
+
+    context 'セール中の価格表示と定価検索' do
+      include ActiveSupport::Testing::TimeHelpers
+
+      let!(:sale_product) { create_product!(name: 'セールりんご', code: 'SKU-SALE-1', price: 1000) }
+
+      before do
+        sale_product.sku.update!(
+          sale_price: 500,
+          sale_starts_at: Time.zone.parse('2026-09-10 10:00:00'),
+          sale_ends_at: Time.zone.parse('2026-09-10 18:00:00')
+        )
+      end
+
+      it '定価と販売価格の両方が表示される' do
+        travel_to Time.zone.parse('2026-09-10 12:00:00') do
+          get products_path, params: { search: 1 }
+
+          expect(response.body).to include('定価')
+          expect(response.body).to include('販売価格')
+          expect(response.body).to include('1,000円')
+          expect(response.body).to include('500円')
+        end
+      end
+
+      it '価格検索は定価で絞り込む（セール価格では絞り込まない）' do
+        travel_to Time.zone.parse('2026-09-10 12:00:00') do
+          get products_path, params: { search: 1, q: { sku_price_lteq: 600 } }
+          expect(response.body).not_to include('セールりんご')
+
+          get products_path, params: { search: 1, q: { sku_price_lteq: 1000 } }
+          expect(response.body).to include('セールりんご')
+        end
+      end
+    end
   end
 end

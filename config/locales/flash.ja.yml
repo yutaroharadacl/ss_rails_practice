@@ -29,8 +29,10 @@ ja:
           not_editable: "完了済みの受注は編集できません"
           not_found: "対象の注文が見つかりませんでした。"
           invalid_search: "検索条件が不正です。"
+          out_of_stock: "注文数が在庫数を超えているため変更ができません。"
       order_items:
         create:
           notice: "商品を追加しました。"
         error:
           duplicate: "この商品はすでに追加されています。"
+          out_of_stock: "注文数が在庫数を超えているため追加ができません。"
